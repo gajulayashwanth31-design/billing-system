@@ -24,6 +24,24 @@ BEGIN
   WHERE product_id = NEW.product_id;
 END$$
 
+-- Audit products created through an actor-scoped admin transaction.
+CREATE TRIGGER trg_products_insert_audit
+AFTER INSERT ON products
+FOR EACH ROW
+BEGIN
+  IF @app_user_id IS NOT NULL THEN
+    INSERT INTO audit_log (table_name, record_id, action, old_value, new_value, changed_by)
+    VALUES (
+      'products', NEW.product_id, 'CREATE', NULL,
+      JSON_OBJECT(
+        'sku', NEW.sku, 'name', NEW.name, 'category_id', NEW.category_id,
+        'tax_id', NEW.tax_id, 'price', NEW.price, 'reorder_level', NEW.reorder_level
+      ),
+      @app_user_id
+    );
+  END IF;
+END$$
+
 -- Audit product price changes.
 CREATE TRIGGER trg_products_price_audit
 AFTER UPDATE ON products
@@ -115,6 +133,14 @@ AFTER UPDATE ON invoices
 FOR EACH ROW
 BEGIN
   IF NEW.status = 'VOID' AND OLD.status <> 'VOID' THEN
+    INSERT INTO audit_log (table_name, record_id, action, old_value, new_value, changed_by)
+    VALUES (
+      'invoices', NEW.invoice_id, 'VOID',
+      JSON_OBJECT('status', OLD.status),
+      JSON_OBJECT('status', NEW.status, 'reason', NEW.void_reason),
+      @app_user_id
+    );
+
     UPDATE stock s
     JOIN (
       SELECT product_id, SUM(quantity) AS quantity

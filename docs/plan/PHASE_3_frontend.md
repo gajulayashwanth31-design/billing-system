@@ -52,10 +52,16 @@ Read `00_README_and_shared_context.md` first. Backend must be running.
 - Mobile responsive down to 375px width for the customer portal and login; POS and admin should work on tablet width and above.
 
 ## Acceptance checklist
-- [ ] Each role logs in and lands on the right page; cannot open other roles' routes by typing the URL
-- [ ] Sidebar shows only allowed links per role
-- [ ] Cashier can create a full bill end to end (customer lookup, cart, coupon, payment)
-- [ ] Out-of-stock error from the backend shows a friendly toast
-- [ ] Admin can add a product, adjust stock, and void an invoice; changes show up in the audit log
-- [ ] Customer sees only their own invoices
-- [ ] Dark and light mode both look fine
+- [x] Each role logs in and lands on the right page; cannot open other roles' routes by typing the URL — PASS: live browser smoke test confirmed admin `/admin`, cashier `/pos`, and customer `/portal`; cashier direct navigation to `/admin` redirected to `/403`. Demo buttons were also enabled and verified for admin/cashier with `VITE_DEMO_MODE=true`.
+- [x] Sidebar shows only allowed links per role — PASS: live browser smoke test confirmed each role's navigation was role-scoped.
+- [x] Cashier can create a full bill end to end (customer lookup, cart, coupon, payment) — PASS: live POS created invoice 13 with customer lookup, `WELCOME5`, and payment; a separate invoice used split Cash/UPI payment.
+- [x] Out-of-stock error from the backend shows a friendly toast — PASS: zero-stock product submission returned HTTP 409 and displayed the backend message as a POS toast.
+- [x] Admin can add a product, adjust stock, and void an invoice; changes show up in the audit log — PASS: browser-created product and stock adjustment appeared in the audit log; voiding invoice 15 logged the reason and restored stock.
+- [x] Customer sees only their own invoices — PASS: customer portal listed owned invoices; requesting another customer's invoice returned 404.
+- [x] Dark and light mode both look fine — PASS: browser checked both themes; customer portal had no horizontal overflow at 375px, and admin layout had no body overflow at mobile width.
+
+### Additional quality verification
+- PASS: `frontend`: `npm run lint` and `npm run build` completed; lint reported existing hook/fast-refresh warnings and Vite reported the expected large-chunk advisory.
+- PASS: `backend`: `npm run lint` and `npm test -- --runInBand` completed; all 11 tests passed.
+- PASS: MySQL `database/tests.sql` completed on the disposable validation instance; all 9 trigger/transaction checks printed PASS.
+- PASS: live browser smoke test opened Categories, Tax rates, Discounts, Users, Invoices, and WhatsApp log without page errors; asynchronous tables loaded their records.

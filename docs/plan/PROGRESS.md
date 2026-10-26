@@ -18,13 +18,16 @@
 - [x] Swagger UI loads and lists all endpoints — PASS: `GET /api-docs/` returned 200; `GET /api-docs.json` returned 200 with 42 paths.
 
 ## Phase 3: Frontend (React)
-- [ ] Each role logs in and lands on the right page; cannot open other roles' routes by typing the URL
-- [ ] Sidebar shows only allowed links per role
-- [ ] Cashier can create a full bill end to end (customer lookup, cart, coupon, payment)
-- [ ] Out-of-stock error from the backend shows a friendly toast
-- [ ] Admin can add a product, adjust stock, and void an invoice; changes show up in the audit log
-- [ ] Customer sees only their own invoices
-- [ ] Dark and light mode both look fine
+- [x] Each role logs in and lands on the right page; cannot open other roles' routes by typing the URL — PASS: live browser smoke test confirmed admin `/admin`, cashier `/pos`, and customer `/portal`; cashier direct navigation to `/admin` redirected to `/403`.
+- [x] Sidebar shows only allowed links per role — PASS: live browser smoke test confirmed each role's navigation was role-scoped.
+- [x] Cashier can create a full bill end to end (customer lookup, cart, coupon, payment) — PASS: invoice 13 completed with customer lookup, `WELCOME5`, and payment; a separate invoice used split Cash/UPI payment.
+- [x] Out-of-stock error from the backend shows a friendly toast — PASS: zero-stock submission returned HTTP 409 and displayed the backend message as a POS toast.
+- [x] Admin can add a product, adjust stock, and void an invoice; changes show up in the audit log — PASS: product creation, stock adjustment, and invoice 15 void appeared in the audit log; void restored stock.
+- [x] Customer sees only their own invoices — PASS: portal listed owned invoices; another customer's invoice returned 404.
+- [x] Dark and light mode both look fine — PASS: both themes checked; no horizontal body overflow at 375px on the customer portal or on the admin mobile layout.
+- [x] Frontend lint/build — PASS: `cd frontend; npm run lint; npm run build` (lint warnings and a large-chunk advisory only).
+- [x] Backend lint/tests — PASS: `cd backend; npm run lint; npm test -- --runInBand` (11 tests passed).
+- [x] Database regression tests — PASS: `mysql --protocol=TCP -h 127.0.0.1 -P 3307 -u root billing_db --execute="source E:/Projects/billing-system/database/tests.sql"` (all 9 checks passed).
 
 ## Phase 4: Invoice PDF, WhatsApp Delivery and Demo-Wow Features
 - [ ] Paying an invoice at the POS produces a PDF and a `whatsapp_messages` row

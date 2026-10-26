@@ -1,7 +1,6 @@
 const {
   query,
   withActorTransaction,
-  withTransaction,
 } = require("../config/db");
 const { notFound } = require("../utils/errors");
 
@@ -121,26 +120,30 @@ function create(resource) {
       );
       return res.status(201).json({ data: { id: result.insertId, ...body } });
     }
-    const id = await withTransaction("ADMIN", async (connection) => {
-      const [result] = await connection.execute(
-        `INSERT INTO products (sku, name, category_id, tax_id, price, reorder_level, is_active)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [
-          body.sku,
-          body.name,
-          body.categoryId,
-          body.taxId,
-          body.price,
-          body.reorderLevel,
-          body.isActive,
-        ],
-      );
-      await connection.execute(
-        "INSERT INTO stock (product_id, quantity) VALUES (?, ?)",
-        [result.insertId, body.initialStock],
-      );
-      return result.insertId;
-    });
+    const id = await withActorTransaction(
+      "ADMIN",
+      req.user.userId,
+      async (connection) => {
+        const [result] = await connection.execute(
+          `INSERT INTO products (sku, name, category_id, tax_id, price, reorder_level, is_active)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [
+            body.sku,
+            body.name,
+            body.categoryId,
+            body.taxId,
+            body.price,
+            body.reorderLevel,
+            body.isActive,
+          ],
+        );
+        await connection.execute(
+          "INSERT INTO stock (product_id, quantity) VALUES (?, ?)",
+          [result.insertId, body.initialStock],
+        );
+        return result.insertId;
+      },
+    );
     return res.status(201).json({ data: { id, ...body } });
   };
 }

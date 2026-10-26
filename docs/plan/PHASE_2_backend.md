@@ -63,10 +63,10 @@ Invoice detail response must include items, computed totals (from `v_invoice_tot
 - `backend/requests.http` containing every endpoint, plus negative tests: cashier DELETE product returns 403, customer reading another customer's invoice returns 404, no token returns 401, invalid input returns 400, insufficient stock returns 409/422 with a trigger message.
 
 ## Acceptance checklist
-- [ ] Server starts, connects with all three pools
-- [ ] Login works for admin, cashier, customer demo accounts; lockout works
-- [ ] Each negative test in `requests.http` returns the expected status code
-- [ ] A cashier cannot change product price even if the app-level check were bypassed (DB denies)
-- [ ] Creating an invoice with insufficient stock fails cleanly and stock is unchanged
-- [ ] Creating an invoice, then a payment, flips status to PAID and creates loyalty points
-- [ ] Swagger UI loads and lists all endpoints
+- [x] PASS — `node server.js` successfully pinged CUSTOMER, CASHIER, and ADMIN pools; `GET /health` returned 200.
+- [x] PASS — Admin, cashier, and customer demo logins returned 200; five consecutive incorrect passwords locked a cashier for five minutes, and the correct password was rejected while locked.
+- [x] PASS — Live API negative checks returned: missing token 401; cashier product DELETE 403; other customer's invoice 404; invalid phone 400; insufficient stock 409 with the trigger message.
+- [x] PASS — Direct MySQL statements as `billing_cashier` returned error 1142 `DELETE command denied` and `UPDATE command denied` for `products`.
+- [x] PASS — Insufficient-stock API request returned 409; exact stock quantity and invoice-count queries were identical before and after.
+- [x] PASS — Invoice was created and paid in split payments; API response showed PAID, and SQL confirmed loyalty award and its reversal on void.
+- [x] PASS — Swagger UI returned 200 and the OpenAPI JSON returned 200 with 42 documented paths.

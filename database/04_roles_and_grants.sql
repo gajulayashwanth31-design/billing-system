@@ -8,9 +8,12 @@ GRANT SELECT ON billing_db.customers TO 'billing_customer'@'%';
 GRANT UPDATE (phone, address) ON billing_db.customers TO 'billing_customer'@'%';
 GRANT SELECT ON billing_db.invoices TO 'billing_customer'@'%';
 GRANT SELECT ON billing_db.invoice_items TO 'billing_customer'@'%';
+GRANT SELECT ON billing_db.v_invoice_items_calc TO 'billing_customer'@'%';
 GRANT SELECT ON billing_db.payments TO 'billing_customer'@'%';
+GRANT SELECT ON billing_db.payment_methods TO 'billing_customer'@'%';
 GRANT SELECT ON billing_db.loyalty_transactions TO 'billing_customer'@'%';
 GRANT SELECT ON billing_db.products TO 'billing_customer'@'%';
+GRANT SELECT ON billing_db.whatsapp_messages TO 'billing_customer'@'%';
 GRANT SELECT ON billing_db.v_invoice_totals TO 'billing_customer'@'%';
 GRANT SELECT ON billing_db.v_customer_tier TO 'billing_customer'@'%';
 
@@ -23,6 +26,8 @@ GRANT SELECT ON billing_db.customers TO 'billing_cashier'@'%';
 GRANT SELECT ON billing_db.invoices TO 'billing_cashier'@'%';
 GRANT SELECT ON billing_db.invoice_items TO 'billing_cashier'@'%';
 GRANT SELECT ON billing_db.payments TO 'billing_cashier'@'%';
+GRANT SELECT ON billing_db.payment_methods TO 'billing_cashier'@'%';
+GRANT SELECT ON billing_db.whatsapp_messages TO 'billing_cashier'@'%';
 GRANT SELECT ON billing_db.v_invoice_items_calc TO 'billing_cashier'@'%';
 GRANT SELECT ON billing_db.v_invoice_totals TO 'billing_cashier'@'%';
 GRANT SELECT ON billing_db.v_customer_tier TO 'billing_cashier'@'%';
@@ -31,10 +36,12 @@ GRANT SELECT ON billing_db.v_sales_by_category TO 'billing_cashier'@'%';
 GRANT SELECT ON billing_db.v_top_products TO 'billing_cashier'@'%';
 GRANT SELECT ON billing_db.v_low_stock TO 'billing_cashier'@'%';
 GRANT INSERT ON billing_db.customers TO 'billing_cashier'@'%';
+GRANT UPDATE (name, phone, email, address, whatsapp_opt_in) ON billing_db.customers TO 'billing_cashier'@'%';
 GRANT INSERT ON billing_db.payments TO 'billing_cashier'@'%';
 GRANT INSERT ON billing_db.whatsapp_messages TO 'billing_cashier'@'%';
 GRANT UPDATE ON billing_db.whatsapp_messages TO 'billing_cashier'@'%';
 GRANT EXECUTE ON PROCEDURE billing_db.sp_create_invoice TO 'billing_cashier'@'%';
+GRANT EXECUTE ON PROCEDURE billing_db.sp_record_payment TO 'billing_cashier'@'%';
 
 GRANT ALL PRIVILEGES ON billing_db.* TO 'billing_admin'@'%';
 

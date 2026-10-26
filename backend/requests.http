@@ -1,0 +1,356 @@
+@baseUrl = http://localhost:4000
+@adminToken = paste-admin-token-here
+@cashierToken = paste-cashier-token-here
+@customerToken = paste-customer-token-here
+@invoiceId = 1
+@productId = 1
+@userId = 5
+@customerId = 1
+@categoryId = 1
+@taxId = 1
+@discountId = 1
+
+### Admin demo login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{"username":"admin","password":"Admin@123"}
+
+### Cashier demo login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{"username":"cashier1","password":"Cashier@123"}
+
+### Customer demo login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{"username":"priya","password":"Customer@123"}
+
+### Current user
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{adminToken}}
+
+### Change password
+POST {{baseUrl}}/api/auth/change-password
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"currentPassword":"Admin@123","newPassword":"NewAdmin@123"}
+
+### Health
+GET {{baseUrl}}/health
+
+### Swagger UI
+GET {{baseUrl}}/api-docs
+
+### Swagger OpenAPI JSON
+GET {{baseUrl}}/api-docs.json
+
+### List users
+GET {{baseUrl}}/api/users?page=1&limit=20&search=cashier&sort=username&direction=asc
+Authorization: Bearer {{adminToken}}
+
+### Get user
+GET {{baseUrl}}/api/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Create cashier
+POST {{baseUrl}}/api/users
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"username":"cashier3","password":"Cashier3@123","role":"CASHIER"}
+
+### Update user
+PUT {{baseUrl}}/api/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"username":"cashier-renamed"}
+
+### Activate user
+POST {{baseUrl}}/api/users/{{userId}}/activate
+Authorization: Bearer {{adminToken}}
+
+### Deactivate user
+POST {{baseUrl}}/api/users/{{userId}}/deactivate
+Authorization: Bearer {{adminToken}}
+
+### Reset user password
+POST {{baseUrl}}/api/users/{{userId}}/reset-password
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"password":"Temporary123"}
+
+### Delete user (soft-deactivate)
+DELETE {{baseUrl}}/api/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Search customers
+GET {{baseUrl}}/api/customers?page=1&limit=20&search=Priya&sort=name&direction=asc
+Authorization: Bearer {{cashierToken}}
+
+### Lookup customer by phone
+GET {{baseUrl}}/api/customers/by-phone/%2B919876543210
+Authorization: Bearer {{cashierToken}}
+
+### Create customer
+POST {{baseUrl}}/api/customers
+Authorization: Bearer {{cashierToken}}
+Content-Type: application/json
+
+{"name":"Demo Customer","phone":"+919812345678","email":"demo.customer@example.in","address":"1 Demo Road, Pune","whatsappOptIn":true}
+
+### Update customer
+PUT {{baseUrl}}/api/customers/{{customerId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"address":"Updated demo address","whatsappOptIn":true}
+
+### List categories
+GET {{baseUrl}}/api/categories?page=1&limit=20&search=Groceries&sort=name
+Authorization: Bearer {{cashierToken}}
+
+### Get category
+GET {{baseUrl}}/api/categories/{{categoryId}}
+Authorization: Bearer {{cashierToken}}
+
+### Create category
+POST {{baseUrl}}/api/categories
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"name":"Demo Category"}
+
+### Update category
+PUT {{baseUrl}}/api/categories/{{categoryId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"name":"Groceries"}
+
+### Delete category
+DELETE {{baseUrl}}/api/categories/5
+Authorization: Bearer {{adminToken}}
+
+### List tax rates
+GET {{baseUrl}}/api/tax-rates?page=1&limit=20&sort=rate_percent
+Authorization: Bearer {{cashierToken}}
+
+### Get tax rate
+GET {{baseUrl}}/api/tax-rates/{{taxId}}
+Authorization: Bearer {{cashierToken}}
+
+### Create tax rate
+POST {{baseUrl}}/api/tax-rates
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"name":"Demo GST 7%","ratePercent":7}
+
+### Update tax rate
+PUT {{baseUrl}}/api/tax-rates/{{taxId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"name":"GST 0%","ratePercent":0}
+
+### Delete tax rate
+DELETE {{baseUrl}}/api/tax-rates/5
+Authorization: Bearer {{adminToken}}
+
+### Search products
+GET {{baseUrl}}/api/products?page=1&limit=20&search=Rice&sort=name&categoryId=1
+Authorization: Bearer {{cashierToken}}
+
+### Get product
+GET {{baseUrl}}/api/products/{{productId}}
+Authorization: Bearer {{cashierToken}}
+
+### Create product
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"sku":"DEMO-001","name":"Demo Product","categoryId":1,"taxId":2,"price":99.5,"reorderLevel":5,"initialStock":20,"isActive":true}
+
+### Update product
+PUT {{baseUrl}}/api/products/{{productId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"price":125}
+
+### Deactivate product
+DELETE {{baseUrl}}/api/products/{{productId}}
+Authorization: Bearer {{adminToken}}
+
+### List stock
+GET {{baseUrl}}/api/stock?page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### Adjust stock
+PUT {{baseUrl}}/api/stock/{{productId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"quantity":50}
+
+### List payment methods
+GET {{baseUrl}}/api/payment-methods
+Authorization: Bearer {{cashierToken}}
+
+### List discounts
+GET {{baseUrl}}/api/discounts?page=1&limit=20&search=WELCOME
+Authorization: Bearer {{cashierToken}}
+
+### Get discount
+GET {{baseUrl}}/api/discounts/{{discountId}}
+Authorization: Bearer {{cashierToken}}
+
+### Validate discount
+POST {{baseUrl}}/api/discounts/validate
+Authorization: Bearer {{cashierToken}}
+Content-Type: application/json
+
+{"code":"WELCOME5","billAmount":500}
+
+### Create discount
+POST {{baseUrl}}/api/discounts
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"code":"API-DEMO","type":"PERCENT","value":5,"validFrom":"2026-01-01T00:00:00.000Z","validTo":"2030-01-01T00:00:00.000Z","minBillAmount":100,"isActive":true}
+
+### Update discount
+PUT {{baseUrl}}/api/discounts/{{discountId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"value":7}
+
+### Delete discount
+DELETE {{baseUrl}}/api/discounts/5
+Authorization: Bearer {{adminToken}}
+
+### Create invoice
+POST {{baseUrl}}/api/invoices
+Authorization: Bearer {{cashierToken}}
+Content-Type: application/json
+
+{"customerId":1,"discountCode":"WELCOME5","items":[{"product_id":1,"quantity":2}]}
+
+### List invoices
+GET {{baseUrl}}/api/invoices?page=1&limit=20&status=PAID&sort=created_at&direction=desc
+Authorization: Bearer {{cashierToken}}
+
+### Get invoice
+GET {{baseUrl}}/api/invoices/{{invoiceId}}
+Authorization: Bearer {{cashierToken}}
+
+### Add split payment
+POST {{baseUrl}}/api/invoices/{{invoiceId}}/payments
+Authorization: Bearer {{cashierToken}}
+Content-Type: application/json
+
+{"methodId":2,"amount":100,"referenceNo":"UPI-DEMO-001"}
+
+### Void invoice
+POST {{baseUrl}}/api/invoices/{{invoiceId}}/void
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"reason":"Duplicate invoice created for demonstration"}
+
+### Download invoice PDF (501 until Phase 4)
+GET {{baseUrl}}/api/invoices/{{invoiceId}}/pdf
+Authorization: Bearer {{customerToken}}
+
+### Resend invoice by WhatsApp (501 until Phase 4)
+POST {{baseUrl}}/api/invoices/{{invoiceId}}/resend-whatsapp
+Authorization: Bearer {{cashierToken}}
+
+### Customer profile
+GET {{baseUrl}}/api/me/profile
+Authorization: Bearer {{customerToken}}
+
+### Update own phone and address
+PUT {{baseUrl}}/api/me/profile
+Authorization: Bearer {{customerToken}}
+Content-Type: application/json
+
+{"phone":"+919876543210","address":"12 MG Road, Bengaluru"}
+
+### Own invoices
+GET {{baseUrl}}/api/me/invoices?page=1&limit=20
+Authorization: Bearer {{customerToken}}
+
+### Own invoice detail
+GET {{baseUrl}}/api/me/invoices/{{invoiceId}}
+Authorization: Bearer {{customerToken}}
+
+### Own loyalty
+GET {{baseUrl}}/api/me/loyalty
+Authorization: Bearer {{customerToken}}
+
+### Reports summary
+GET {{baseUrl}}/api/reports/summary
+Authorization: Bearer {{adminToken}}
+
+### Sales by day
+GET {{baseUrl}}/api/reports/sales-by-day?limit=30
+Authorization: Bearer {{adminToken}}
+
+### Sales by category
+GET {{baseUrl}}/api/reports/sales-by-category
+Authorization: Bearer {{adminToken}}
+
+### Payment split
+GET {{baseUrl}}/api/reports/payment-split
+Authorization: Bearer {{adminToken}}
+
+### Top products
+GET {{baseUrl}}/api/reports/top-products?limit=5
+Authorization: Bearer {{adminToken}}
+
+### Top cashiers
+GET {{baseUrl}}/api/reports/top-cashiers?limit=5
+Authorization: Bearer {{adminToken}}
+
+### Low stock
+GET {{baseUrl}}/api/reports/low-stock?limit=20
+Authorization: Bearer {{adminToken}}
+
+### Audit log
+GET {{baseUrl}}/api/audit-log?page=1&limit=20&table=stock&from=2026-01-01&to=2030-01-01
+Authorization: Bearer {{adminToken}}
+
+### WhatsApp messages
+GET {{baseUrl}}/api/whatsapp-messages?page=1&limit=20&status=SENT
+Authorization: Bearer {{adminToken}}
+
+### Negative: no token returns 401
+GET {{baseUrl}}/api/users
+
+### Negative: cashier cannot delete a product (403)
+DELETE {{baseUrl}}/api/products/1
+Authorization: Bearer {{cashierToken}}
+
+### Negative: customer cannot read another customer's invoice (404)
+GET {{baseUrl}}/api/me/invoices/2
+Authorization: Bearer {{customerToken}}
+
+### Negative: invalid phone input returns 400
+GET {{baseUrl}}/api/customers/by-phone/not-a-phone
+Authorization: Bearer {{cashierToken}}
+
+### Negative: insufficient stock returns 409 with trigger message
+POST {{baseUrl}}/api/invoices
+Authorization: Bearer {{cashierToken}}
+Content-Type: application/json
+
+{"customerId":1,"items":[{"product_id":15,"quantity":10000}]}

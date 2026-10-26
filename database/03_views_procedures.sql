@@ -101,6 +101,7 @@ JOIN stock s ON s.product_id = p.product_id
 WHERE s.quantity <= p.reorder_level AND p.is_active = TRUE;
 
 DROP PROCEDURE IF EXISTS sp_create_invoice;
+DROP PROCEDURE IF EXISTS sp_record_payment;
 DROP PROCEDURE IF EXISTS sp_void_invoice;
 DROP PROCEDURE IF EXISTS sp_monthly_sales_report;
 
@@ -217,6 +218,50 @@ BEGIN
   UPDATE invoices SET status = 'VOID', void_reason = p_reason, voided_by = p_user_id
   WHERE invoice_id = p_invoice_id;
   SET @app_user_id = NULL;
+  COMMIT;
+END$$
+
+CREATE PROCEDURE sp_record_payment(
+  IN p_invoice_id BIGINT UNSIGNED,
+  IN p_cashier_id BIGINT UNSIGNED,
+  IN p_method_id BIGINT UNSIGNED,
+  IN p_amount DECIMAL(12,2),
+  IN p_reference_no VARCHAR(100),
+  OUT p_payment_id BIGINT UNSIGNED
+)
+SQL SECURITY DEFINER
+BEGIN
+  DECLARE current_status VARCHAR(20);
+  DECLARE current_cashier_id BIGINT UNSIGNED;
+  DECLARE current_balance DECIMAL(12,2);
+  DECLARE invoice_count INT DEFAULT 0;
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    ROLLBACK;
+    RESIGNAL;
+  END;
+  START TRANSACTION;
+  SELECT COUNT(*) INTO invoice_count FROM invoices WHERE invoice_id = p_invoice_id;
+  IF invoice_count = 0 THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invoice does not exist';
+  END IF;
+  SELECT status, cashier_id INTO current_status, current_cashier_id
+  FROM invoices WHERE invoice_id = p_invoice_id FOR UPDATE;
+  IF SUBSTRING_INDEX(USER(), '@', 1) = 'billing_cashier'
+     AND current_cashier_id <> p_cashier_id THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cashier can only accept payment for their own invoices';
+  END IF;
+  IF current_status NOT IN ('DRAFT', 'FINALIZED') THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invoice is not awaiting payment';
+  END IF;
+  SELECT balance INTO current_balance
+  FROM v_invoice_totals WHERE invoice_id = p_invoice_id;
+  IF p_amount > current_balance THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Payment amount exceeds the invoice balance';
+  END IF;
+  INSERT INTO payments (invoice_id, method_id, amount, reference_no)
+  VALUES (p_invoice_id, p_method_id, p_amount, p_reference_no);
+  SET p_payment_id = LAST_INSERT_ID();
   COMMIT;
 END$$
 

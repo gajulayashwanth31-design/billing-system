@@ -9,13 +9,13 @@
 - [x] ER diagram renders in Markdown preview — PASS: Mermaid ER diagram syntax and all table relationships/attributes reviewed in `database/ER_DIAGRAM.md`.
 
 ## Phase 2: Backend (Express API)
-- [ ] Server starts, connects with all three pools
-- [ ] Login works for admin, cashier, customer demo accounts; lockout works
-- [ ] Each negative test in `requests.http` returns the expected status code
-- [ ] A cashier cannot change product price even if the app-level check were bypassed (DB denies)
-- [ ] Creating an invoice with insufficient stock fails cleanly and stock is unchanged
-- [ ] Creating an invoice, then a payment, flips status to PAID and creates loyalty points
-- [ ] Swagger UI loads and lists all endpoints
+- [x] Server starts, connects with all three pools — PASS: `node server.js` completed all three `pingPools`; `GET /health` returned 200.
+- [x] Login works for admin, cashier, customer demo accounts; lockout works — PASS: all three demo logins returned 200; five wrong passwords then a correct password returned 401 while `locked_until > NOW()`.
+- [x] Each negative test in `requests.http` returns the expected status code — PASS: no token 401, cashier product DELETE 403, foreign customer/cashier invoice 404, invalid phone 400, and insufficient stock 409 with trigger text.
+- [x] A cashier cannot change product price even if the app-level check were bypassed (DB denies) — PASS: direct MySQL cashier UPDATE and DELETE both returned error 1142 `command denied`.
+- [x] Creating an invoice with insufficient stock fails cleanly and stock is unchanged — PASS: API returned 409; exact before/after stock and invoice-count queries matched.
+- [x] Creating an invoice, then a payment, flips status to PAID and creates loyalty points — PASS: a new invoice was paid in split payments; API returned PAID and SQL showed +1 loyalty point (then -1 on the subsequent void).
+- [x] Swagger UI loads and lists all endpoints — PASS: `GET /api-docs/` returned 200; `GET /api-docs.json` returned 200 with 42 paths.
 
 ## Phase 3: Frontend (React)
 - [ ] Each role logs in and lands on the right page; cannot open other roles' routes by typing the URL

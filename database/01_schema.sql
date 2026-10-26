@@ -89,6 +89,7 @@ CREATE TABLE discounts (
   min_bill_amount DECIMAL(12,2) NOT NULL DEFAULT 0,
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   CONSTRAINT chk_discount_value CHECK (value > 0),
+  CONSTRAINT chk_discount_percent_value CHECK (type <> 'PERCENT' OR value <= 100),
   CONSTRAINT chk_discount_min_bill CHECK (min_bill_amount >= 0),
   CONSTRAINT chk_discount_dates CHECK (valid_to > valid_from)
 ) ENGINE=InnoDB;

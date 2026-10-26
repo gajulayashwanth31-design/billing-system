@@ -41,9 +41,9 @@
 - [x] Audit timeline and low-stock feature — PASS: audit entries rendered in the timeline; low-stock banner/CSV action appeared when product 1 was temporarily set to zero, then its original stock (38) was restored.
 - [x] Backend lint/tests, frontend lint/build, and database regression checks — PASS: backend lint; all 21 Jest tests; frontend lint/build; all 10 SQL checks. Frontend has existing lint warnings and Vite's large-chunk advisory only.
 
-## Phase 5: Tests, Docker, Docs and Demo Script
+## Phase 5: Tests, Local Setup, Docs and Demo Script
 - [x] `npm test` passes in backend — PASS: `cd backend; $env:TEST_DB_PORT='3307'; npm test` rebuilt the isolated `billing_test`; SQL regressions passed 10/10 and Jest passed 7 suites / 39 tests.
-- [ ] `docker compose up --build` gives a working app with seeded data — BLOCKED: `docker compose config --quiet` passed with temporary validation environment values, but `docker compose up --build` could not connect to `npipe:////./pipe/dockerDesktopLinuxEngine`; Docker Desktop/engine is unavailable in this environment.
+- [x] Root `db:setup`, `dev:backend`, `dev:frontend`, and `dev` scripts start the local application — PASS: `db:setup` initialized a temporary local MySQL 8 schema from SQL files 01–05 (22 tables, 5 seeded users); `npm run dev` started the backend (`/health` returned `ok`) and frontend (HTTP 200).
 - [ ] README lets a new person run the project in under 10 minutes — NOT VERIFIED: setup paths, commands, environment variables, seeded credentials, and troubleshooting are documented in `README.md`, but a fresh-clone timed run was not performed.
 - [ ] Demo script rehearsed once end to end with real WhatsApp and once with mock — PARTIAL / BLOCKED: the mock invoice-to-PDF/notification flow was exercised in Phase 4 and covered by the Phase 5 automated tests; a complete timed rehearsal of this script and real handset delivery remain unverified. Real delivery needs Twilio credentials, public HTTPS URLs, and a joined sandbox handset.
-- [x] No secrets committed; `.env.example` complete — PASS: the tracked-file scan found no credential patterns or tracked `.env` files; `.env.example`, `backend/.env.example`, and `frontend/.env.example` provide the Compose, backend, and frontend settings; ignore rules cover `.env`, `backend/storage/`, and `dist/`.
+- [x] No secrets committed; `.env.example` complete — PASS: `.env` files are ignored; root and backend environment examples contain placeholders, and ignore rules cover `backend/storage/` and `dist/`.

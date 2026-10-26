@@ -21,7 +21,7 @@ Do not start the next phase.
 | 2 | PHASE_2_backend.md | Express API with auth, RBAC, per-role DB pools |
 | 3 | PHASE_3_frontend.md | React app: login, POS, admin dashboard, customer portal |
 | 4 | PHASE_4_pdf_whatsapp_features.md | Invoice PDF, WhatsApp sending, unique demo features |
-| 5 | PHASE_5_tests_docker_docs.md | Tests, Docker, README, demo script |
+| 5 | PHASE_5_tests_local_setup_docs.md | Tests, local run scripts, README, demo script |
 
 ## Project overview
 A billing system with three roles (CUSTOMER, CASHIER, ADMIN). Cashiers create bills at a POS screen; when an invoice is paid, a PDF invoice is generated and sent to the customer's WhatsApp number. Admins manage everything and see analytics. Customers see only their own invoices.
@@ -32,7 +32,6 @@ A billing system with three roles (CUSTOMER, CASHIER, ADMIN). Cashiers create bi
 - Frontend: React + Vite + Tailwind CSS, React Router, Axios, Recharts
 - PDF: pdfkit + qrcode
 - WhatsApp: Twilio WhatsApp API (sandbox) behind a provider interface, plus a MOCK provider (env `WHATSAPP_PROVIDER=twilio|mock`)
-- Optional: Docker Compose
 
 ## Target folder structure
 ```
@@ -59,7 +58,6 @@ billing-system/
     api.md
     permissions_matrix.md
     demo-script.md
-  docker-compose.yml
   README.md
 ```
 

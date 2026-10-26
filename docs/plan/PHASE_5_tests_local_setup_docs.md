@@ -1,6 +1,6 @@
-# PHASE 5: Tests, Docker, Docs and Demo Script
+# PHASE 5: Tests, Local Setup, Docs and Demo Script
 
-**Goal:** make the project reliable, easy to run on any machine, and easy to present.
+**Goal:** make the project reliable, easy to run locally, and easy to present.
 
 Read `00_README_and_shared_context.md` first. Phases 1 to 4 must be working.
 
@@ -30,14 +30,16 @@ Check and fix:
 - ESLint + Prettier for backend and frontend; fix all errors.
 - Remove unused code and console logs (keep intentional logging).
 
-## Step 4: Docker (`docker-compose.yml`)
-- Services: `mysql` (mounts `database/*.sql` into `/docker-entrypoint-initdb.d` in the right order), `backend`, `frontend`.
-- Healthchecks so the backend waits for MySQL.
-- `.env.example` for compose; document ports.
-- Verify: fresh clone, copy env, `docker compose up --build`, log in as all three roles with seeded data.
+## Step 4: Local run scripts
+- Add a root-level `package.json` with:
+  - `db:setup`: runs `database/01_schema.sql` through `database/05_seed.sql`, in order, against local MySQL 8.
+  - `dev:backend`: starts the backend development server.
+  - `dev:frontend`: starts the frontend development server.
+  - `dev`: runs both development servers with `concurrently`.
+- Document local prerequisites, environment files, database setup, app start, and troubleshooting in `README.md`.
 
 ## Step 5: Documentation
-- `README.md`: overview, feature list, architecture diagram (Mermaid), prerequisites, setup with and without Docker, env variable table, Twilio sandbox setup (join code, sandbox number, ngrok command, webhook URLs), demo accounts, troubleshooting (common errors and fixes).
+- `README.md`: overview, feature list, architecture diagram (Mermaid), manual local setup, env variable table, Twilio sandbox setup, demo accounts, troubleshooting.
 - `docs/architecture.md`: components, data flow for "create bill to WhatsApp" (Mermaid sequence diagram), why separate DB users per role.
 - `docs/api.md`: endpoint table with method, path, role access, short description.
 - `docs/permissions_matrix.md`: role vs action at app level and at DB GRANT level.
@@ -53,12 +55,12 @@ Check and fix:
 - `docs/viva_questions.md`: 15 likely questions with short answers (why triggers, why separate DB users, transactions and ACID in `sp_create_invoice`, why totals are in views, why price snapshot in invoice_items, how the signed URL works, how RBAC is enforced at two levels, etc.). Normalization questions can be added later.
 
 ## Step 6: Final verification
-- Run everything from a clean state and list anything that does not work.
+- Run tests, lint, and builds from a local MySQL 8 setup and list anything that does not work.
 - Tag the repo `v1.0-demo`.
 
 ## Acceptance checklist
-- [x] `npm test` passes in backend — PASS: `cd backend; $env:TEST_DB_PORT='3307'; npm test` rebuilt the isolated `billing_test`; SQL regressions passed 10/10 and Jest passed 7 suites / 39 tests.
-- [ ] `docker compose up --build` gives a working app with seeded data — BLOCKED: `docker compose config --quiet` passed with temporary validation environment values, but `docker compose up --build` could not connect to `npipe:////./pipe/dockerDesktopLinuxEngine`; Docker Desktop/engine is unavailable in this environment.
-- [ ] README lets a new person run the project in under 10 minutes — NOT VERIFIED: setup paths, commands, environment variables, seeded credentials, and troubleshooting are documented in `README.md`, but a fresh-clone timed run was not performed.
-- [ ] Demo script rehearsed once end to end with real WhatsApp and once with mock — PARTIAL / BLOCKED: the mock invoice-to-PDF/notification flow was exercised in Phase 4 and covered by the Phase 5 automated tests; a complete timed rehearsal of this script and real handset delivery remain unverified. Real delivery needs Twilio credentials, public HTTPS URLs, and a joined sandbox handset.
-- [x] No secrets committed; `.env.example` complete — PASS: the tracked-file scan found no credential patterns or tracked `.env` files; `.env.example`, `backend/.env.example`, and `frontend/.env.example` provide the Compose, backend, and frontend settings; ignore rules cover `.env`, `backend/storage/`, and `dist/`.
+- [x] Backend tests pass — PASS: the isolated `billing_test` database was rebuilt; SQL regressions passed 10/10 and Jest passed 7 suites / 39 tests.
+- [ ] Root `db:setup`, `dev:backend`, `dev:frontend`, and `dev` scripts start the local application — NOT VERIFIED: local database and frontend/backend startup need a fresh end-to-end verification.
+- [ ] README lets a new person run the project in under 10 minutes — NOT VERIFIED: setup commands and troubleshooting are documented, but a fresh-clone timed run was not performed.
+- [ ] Demo script rehearsed once end to end with real WhatsApp and once with mock — PARTIAL / BLOCKED: real delivery needs Twilio credentials, public HTTPS URLs, and a joined sandbox handset.
+- [x] No secrets committed; `.env.example` complete — PASS: `.env` files are ignored and example files contain placeholders only.

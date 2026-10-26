@@ -86,7 +86,7 @@ function initializeTestDatabase(mysqlCli, mysqlEnv) {
       "--protocol=TCP",
       "--default-character-set=utf8mb4",
       "--host",
-      process.env.TEST_DB_HOST || process.env.DB_HOST || "127.0.0.1",
+      process.env.TEST_DB_HOST || process.env.DB_HOST || "localhost",
       "--port",
       process.env.TEST_DB_PORT || process.env.DB_PORT || "3306",
       "--user",
@@ -130,7 +130,7 @@ function main() {
   const testEnv = {
     ...process.env,
     NODE_ENV: "test",
-    DB_HOST: process.env.TEST_DB_HOST || process.env.DB_HOST || "127.0.0.1",
+    DB_HOST: process.env.TEST_DB_HOST || process.env.DB_HOST || "localhost",
     DB_PORT: process.env.TEST_DB_PORT || process.env.DB_PORT || "3306",
     DB_NAME: "billing_test",
     DB_CUSTOMER_USER: process.env.DB_CUSTOMER_USER || "billing_customer",

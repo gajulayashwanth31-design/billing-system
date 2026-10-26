@@ -1,0 +1,16 @@
+{
+  "name": "billing-system",
+  "private": true,
+  "scripts": {
+    "db:setup": "node scripts/db-setup.js",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev": "concurrently -k -n backend,frontend \"npm:dev:backend\" \"npm:dev:frontend\""
+  },
+  "dependencies": {
+    "dotenv": "^18.0.9"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

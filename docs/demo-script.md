@@ -1,6 +1,6 @@
 # Five-minute demo walkthrough
 
-Use the seeded data in a local or Compose demo. The seeded credentials are public demo credentials and must not be reused in production.
+Use the seeded data in a local demo. The seeded credentials are public demo credentials and must not be reused in production.
 
 ## 1. Login and role boundaries (30 seconds)
 
@@ -39,3 +39,10 @@ Open **DB permissions demo**. Run `delete_product` as CASHIER, then as ADMIN. Sh
 ## Fallback if WhatsApp fails
 
 Use the admin WhatsApp log to show the final status and retry count. For a presentation without Twilio connectivity, set `WHATSAPP_PROVIDER=mock`, restart the backend, create/pay a disposable invoice, and show the PDF plus SENT mock notification. Do not claim that a real phone received a message when only the mock provider was used.
+
+## 30 minutes before the demo
+
+1. Restart ngrok and update `PUBLIC_BASE_URL` in `backend/.env` to its current HTTPS URL.
+2. Re-join the Twilio WhatsApp Sandbox from every demo phone by sending the current `join <code>` message; sandbox membership expires after 72 hours.
+3. Run `npm run test:whatsapp -- +91XXXXXXXXXX` from `backend` and confirm that the test text and sample PDF are delivered.
+4. Keep `WHATSAPP_PROVIDER=mock` ready as the fallback; switch back to it and restart the backend if the sandbox or public URL is unavailable.

@@ -1,7 +1,7 @@
 const mysql = require("mysql2/promise");
 
 const poolConfig = {
-  host: process.env.DB_HOST,
+  host: process.env.DB_HOST || "localhost",
   port: Number(process.env.DB_PORT || 3306),
   database: process.env.DB_NAME,
   waitForConnections: true,

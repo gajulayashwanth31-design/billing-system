@@ -105,6 +105,7 @@ CREATE TABLE invoices (
   customer_id BIGINT UNSIGNED NOT NULL,
   cashier_id BIGINT UNSIGNED NOT NULL,
   discount_id BIGINT UNSIGNED NULL,
+  tier_discount_percent DECIMAL(5,2) NOT NULL DEFAULT 0,
   status ENUM('DRAFT','FINALIZED','PAID','VOID') NOT NULL DEFAULT 'DRAFT',
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   void_reason VARCHAR(500) NULL,
@@ -115,6 +116,7 @@ CREATE TABLE invoices (
     ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT fk_invoices_discount FOREIGN KEY (discount_id) REFERENCES discounts(discount_id)
     ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT chk_invoices_tier_discount CHECK (tier_discount_percent BETWEEN 0 AND 8),
   CONSTRAINT fk_invoices_voided_by FOREIGN KEY (voided_by) REFERENCES users(user_id)
     ON DELETE SET NULL ON UPDATE CASCADE,
   INDEX idx_invoices_customer_date (customer_id, created_at),

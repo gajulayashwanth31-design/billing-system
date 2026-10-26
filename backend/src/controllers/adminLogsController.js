@@ -34,11 +34,11 @@ async function auditLog(req, res) {
   const [rows, counts] = await Promise.all([
     query(
       "ADMIN",
-      `SELECT log_id AS id, table_name AS tableName, record_id AS recordId, action,
-              old_value AS oldValue, new_value AS newValue, changed_by AS changedBy,
-              changed_at AS changedAt
-       FROM audit_log ${where}
-       ORDER BY ${orderBy} ${filters.direction === "asc" ? "ASC" : "DESC"}, log_id DESC LIMIT ? OFFSET ?`,
+      `SELECT log.log_id AS id, log.table_name AS tableName, log.record_id AS recordId, log.action,
+              log.old_value AS oldValue, log.new_value AS newValue, log.changed_by AS changedBy,
+              actor.username AS changedByName, log.changed_at AS changedAt
+       FROM audit_log log LEFT JOIN users actor ON actor.user_id = log.changed_by ${where}
+       ORDER BY ${orderBy === "table_name" ? "log.table_name" : "log.changed_at"} ${filters.direction === "asc" ? "ASC" : "DESC"}, log.log_id DESC LIMIT ? OFFSET ?`,
       [...params, limit, offset],
     ),
     query("ADMIN", `SELECT COUNT(*) AS total FROM audit_log ${where}`, params),

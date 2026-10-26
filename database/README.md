@@ -19,6 +19,21 @@ mysql -u root -p --execute="source database/tests.sql"
 mysql -u root -p --execute="source database/06_demo_queries.sql"
 ```
 
+For a database already upgraded through Phase 3, run the Phase 4 migration and
+rebuild the totals view and invoice procedures before starting the backend:
+
+```powershell
+mysql -u root -p --execute="source database/07_phase4_migration.sql"
+mysql -u root -p --execute="source database/03_views_procedures.sql"
+mysql -u root -p --execute="source database/04_roles_and_grants.sql"
+mysql -u root -p --execute="source database/tests.sql"
+```
+
+`07_phase4_migration.sql` is safe to rerun. A fresh install already creates the
+tier-discount column in `01_schema.sql`; the migration then does nothing.
+Reapply role grants after rebuilding procedures because the database migration
+drops and recreates the procedures.
+
 Verify seeded table counts:
 
 ```sql

@@ -7,10 +7,13 @@ import AdminDashboard from './pages/AdminDashboard'
 import InvoiceListPage, { InvoiceDetailPage } from './pages/InvoicePages'
 import LoginPage from './pages/LoginPage'
 import { AuditLogPage, WhatsAppLogPage } from './pages/LogPages'
+import AuditTimelinePage from './pages/AuditTimelinePage'
+import DbPermissionsPage from './pages/DbPermissionsPage'
 import PortalPage from './pages/PortalPage'
 import PosPage from './pages/PosPage'
 import ResourcePage from './pages/ResourcePage'
 import StockPage from './pages/StockPage'
+import VerifyPage from './pages/VerifyPage'
 import { homeForRole } from './utils/format'
 
 function ForbiddenPage() {
@@ -41,7 +44,9 @@ function AppRoutes() {
       <Route path="/admin/invoices/:id" element={<InvoiceDetailPage />} />
       <Route path="/admin/stock" element={<StockPage />} />
       <Route path="/admin/audit-log" element={<AuditLogPage />} />
+      <Route path="/admin/audit-timeline" element={<AuditTimelinePage />} />
       <Route path="/admin/whatsapp-log" element={<WhatsAppLogPage />} />
+      {import.meta.env.VITE_DEMO_MODE === 'true' && <Route path="/admin/db-permissions" element={<DbPermissionsPage />} />}
     </Route></Route>
     <Route element={<ProtectedRoute allowedRoles={['CASHIER']} />}><Route element={<Layout />}>
       <Route path="/pos" element={<PosPage />} />
@@ -53,6 +58,7 @@ function AppRoutes() {
       <Route path="/portal/invoices/:id" element={<InvoiceDetailPage />} />
     </Route></Route>
     <Route path="/" element={<IndexRedirect />} />
+    <Route path="/verify/:invoiceNo" element={<VerifyPage />} />
     <Route path="/404" element={<NotFoundPage />} />
     <Route path="*" element={<NotFoundPage />} />
   </Routes>

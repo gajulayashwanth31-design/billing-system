@@ -140,6 +140,21 @@ BEGIN
             AND initial_invoice_count = (SELECT COUNT(*) FROM invoices),
             'PASS: failed invoice procedure rolls back fully',
             'FAIL: failed invoice procedure left partial changes') AS result;
+
+  START TRANSACTION;
+  INSERT INTO invoices (invoice_no, customer_id, cashier_id, tier_discount_percent, status)
+  VALUES (CONCAT('T', SUBSTRING(REPLACE(UUID(), '-', ''), 1, 20)), 1, 2, 5, 'DRAFT');
+  SET test_invoice_id = LAST_INSERT_ID();
+  INSERT INTO invoice_items (invoice_id, product_id, quantity, unit_price, tax_rate)
+  VALUES (test_invoice_id, 15, 1, 175.00, 28.00);
+  SELECT IF(
+    (SELECT coupon_discount_amount FROM v_invoice_totals WHERE invoice_id = test_invoice_id) = 0
+    AND (SELECT tier_discount_amount FROM v_invoice_totals WHERE invoice_id = test_invoice_id) = 11.20
+    AND (SELECT discount_amount FROM v_invoice_totals WHERE invoice_id = test_invoice_id) = 11.20
+    AND (SELECT grand_total FROM v_invoice_totals WHERE invoice_id = test_invoice_id) = 212.80,
+    'PASS: tier discount is included separately in invoice totals',
+    'FAIL: tier discount does not match invoice totals') AS result;
+  ROLLBACK;
 END$$
 DELIMITER ;
 

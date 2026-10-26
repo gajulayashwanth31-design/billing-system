@@ -17,36 +17,62 @@ JOIN products p ON p.product_id = ii.product_id;
 
 CREATE OR REPLACE VIEW v_invoice_totals AS
 SELECT
-  totals.invoice_id,
-  totals.subtotal,
-  totals.tax,
-  totals.discount_amount,
-  ROUND(totals.subtotal + totals.tax - totals.discount_amount, 2) AS grand_total,
-  totals.paid_amount,
-  ROUND(GREATEST(totals.subtotal + totals.tax - totals.discount_amount - totals.paid_amount, 0), 2) AS balance
+  priced.invoice_id,
+  priced.subtotal,
+  priced.tax,
+  priced.coupon_discount_amount,
+  priced.tier_discount_amount,
+  ROUND(priced.coupon_discount_amount + priced.tier_discount_amount, 2) AS discount_amount,
+  ROUND(priced.subtotal + priced.tax - priced.coupon_discount_amount - priced.tier_discount_amount, 2) AS grand_total,
+  priced.paid_amount,
+  ROUND(GREATEST(priced.subtotal + priced.tax - priced.coupon_discount_amount - priced.tier_discount_amount - priced.paid_amount, 0), 2) AS balance
 FROM (
   SELECT
-    i.invoice_id,
-    ROUND(COALESCE(SUM(calc.line_subtotal), 0), 2) AS subtotal,
-    ROUND(COALESCE(SUM(calc.line_tax), 0), 2) AS tax,
-    ROUND(CASE
-      WHEN d.discount_id IS NULL OR d.is_active = FALSE OR NOW() NOT BETWEEN d.valid_from AND d.valid_to
-        OR COALESCE(SUM(calc.line_subtotal + calc.line_tax), 0) < d.min_bill_amount THEN 0
-      WHEN d.type = 'PERCENT' THEN LEAST(
-        COALESCE(SUM(calc.line_subtotal + calc.line_tax), 0),
-        COALESCE(SUM(calc.line_subtotal + calc.line_tax), 0) * d.value / 100
-      )
-      ELSE LEAST(COALESCE(SUM(calc.line_subtotal + calc.line_tax), 0), d.value)
-    END, 2) AS discount_amount,
-    ROUND(COALESCE((
-      SELECT SUM(pay.amount) FROM payments pay WHERE pay.invoice_id = i.invoice_id
-    ), 0), 2) AS paid_amount
-  FROM invoices i
-  LEFT JOIN v_invoice_items_calc calc ON calc.invoice_id = i.invoice_id
-  LEFT JOIN discounts d ON d.discount_id = i.discount_id
-  GROUP BY i.invoice_id, d.discount_id, d.is_active, d.valid_from, d.valid_to,
-           d.min_bill_amount, d.type, d.value
-) totals;
+    coupon.invoice_id,
+    coupon.subtotal,
+    coupon.tax,
+    coupon.paid_amount,
+    coupon.coupon_discount_amount,
+    ROUND(GREATEST(coupon.gross_amount - coupon.coupon_discount_amount, 0) * coupon.tier_discount_percent / 100, 2) AS tier_discount_amount
+  FROM (
+    SELECT
+      base.invoice_id,
+      base.subtotal,
+      base.tax,
+      base.gross_amount,
+      base.tier_discount_percent,
+      base.paid_amount,
+      ROUND(CASE
+        WHEN base.discount_id IS NULL OR base.is_active = FALSE OR NOW() NOT BETWEEN base.valid_from AND base.valid_to
+          OR base.gross_amount < base.min_bill_amount THEN 0
+        WHEN base.type = 'PERCENT' THEN LEAST(base.gross_amount, base.gross_amount * base.value / 100)
+        ELSE LEAST(base.gross_amount, base.value)
+      END, 2) AS coupon_discount_amount
+    FROM (
+      SELECT
+        i.invoice_id,
+        ROUND(COALESCE(SUM(calc.line_subtotal), 0), 2) AS subtotal,
+        ROUND(COALESCE(SUM(calc.line_tax), 0), 2) AS tax,
+        ROUND(COALESCE(SUM(calc.line_subtotal + calc.line_tax), 0), 2) AS gross_amount,
+        i.tier_discount_percent,
+        d.discount_id,
+        d.is_active,
+        d.valid_from,
+        d.valid_to,
+        d.min_bill_amount,
+        d.type,
+        d.value,
+        ROUND(COALESCE((
+          SELECT SUM(pay.amount) FROM payments pay WHERE pay.invoice_id = i.invoice_id
+        ), 0), 2) AS paid_amount
+      FROM invoices i
+      LEFT JOIN v_invoice_items_calc calc ON calc.invoice_id = i.invoice_id
+      LEFT JOIN discounts d ON d.discount_id = i.discount_id
+      GROUP BY i.invoice_id, i.tier_discount_percent, d.discount_id, d.is_active, d.valid_from,
+               d.valid_to, d.min_bill_amount, d.type, d.value
+    ) base
+  ) coupon
+) priced;
 
 CREATE OR REPLACE VIEW v_customer_tier AS
 SELECT
@@ -121,6 +147,7 @@ BEGIN
   DECLARE current_price DECIMAL(12,2);
   DECLARE current_tax DECIMAL(5,2);
   DECLARE current_discount_id BIGINT UNSIGNED DEFAULT NULL;
+  DECLARE current_tier_discount_percent DECIMAL(5,2) DEFAULT 0;
   DECLARE current_invoice_no VARCHAR(30);
   DECLARE discount_count INT DEFAULT 0;
   DECLARE product_count INT DEFAULT 0;
@@ -150,9 +177,18 @@ BEGIN
       AND NOW() BETWEEN valid_from AND valid_to;
   END IF;
 
+  SELECT CASE tier
+    WHEN 'Silver' THEN 2
+    WHEN 'Gold' THEN 5
+    WHEN 'Platinum' THEN 8
+    ELSE 0
+  END INTO current_tier_discount_percent
+  FROM v_customer_tier
+  WHERE customer_id = p_customer_id;
+
   SET current_invoice_no = CONCAT('P-', SUBSTRING(REPLACE(UUID(), '-', ''), 1, 20));
-  INSERT INTO invoices (invoice_no, customer_id, cashier_id, discount_id, status)
-  VALUES (current_invoice_no, p_customer_id, p_cashier_id, current_discount_id, 'DRAFT');
+  INSERT INTO invoices (invoice_no, customer_id, cashier_id, discount_id, tier_discount_percent, status)
+  VALUES (current_invoice_no, p_customer_id, p_cashier_id, current_discount_id, current_tier_discount_percent, 'DRAFT');
   SET p_invoice_id = LAST_INSERT_ID();
   UPDATE invoices
   SET invoice_no = CONCAT('INV-', YEAR(CURRENT_DATE), '-', LPAD(p_invoice_id, 8, '0'))

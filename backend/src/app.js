@@ -22,6 +22,10 @@ const customerPortalRoutes = require("./routes/customerPortalRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const paymentMethodRoutes = require("./routes/paymentMethodRoutes");
+const publicInvoiceRoutes = require("./routes/publicInvoiceRoutes");
+const signedInvoicePdfRoutes = require("./routes/signedInvoicePdfRoutes");
+const twilioWebhookRoutes = require("./routes/twilioWebhookRoutes");
+const dbPermissionsRoutes = require("./routes/dbPermissionsRoutes");
 
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
   throw new Error("JWT_SECRET must be configured with at least 32 characters");
@@ -36,6 +40,7 @@ app.use(
     credentials: true,
   }),
 );
+app.use(express.urlencoded({ extended: false, limit: "32kb" }));
 app.use(express.json({ limit: "1mb" }));
 app.use(morgan("combined"));
 
@@ -43,6 +48,10 @@ app.get("/health", (req, res) => res.json({ status: "ok" }));
 app.get("/api-docs.json", (req, res) => res.json(openapiDocument));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openapiDocument));
 app.use("/api/auth", authRoutes);
+app.use("/api/public", publicInvoiceRoutes);
+app.use("/public/invoices", signedInvoicePdfRoutes);
+app.use("/api/webhooks/twilio", twilioWebhookRoutes);
+app.use("/api/demo", dbPermissionsRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/categories", createCatalogRouter("categories"));

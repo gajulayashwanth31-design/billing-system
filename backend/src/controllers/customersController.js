@@ -55,6 +55,8 @@ async function create(req, res) {
       email: email || null,
       address: address || null,
       whatsappOptIn,
+      tier: "Silver",
+      lifetimeSpend: 0,
     },
   });
 }

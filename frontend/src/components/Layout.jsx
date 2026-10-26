@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import {
-  Activity, Boxes, CircleHelp, FileText, LayoutDashboard,
+  Activity, Boxes, CircleHelp, Database, FileText, GitCommitHorizontal, LayoutDashboard,
   LogOut, Menu, Moon, Package, Percent, ReceiptText, Settings2, Sun, Tags, Users, X,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
@@ -19,7 +19,9 @@ const links = {
     { to: '/admin/invoices', label: 'Invoices', icon: FileText },
     { to: '/admin/stock', label: 'Stock control', icon: Boxes },
     { to: '/admin/audit-log', label: 'Audit log', icon: Activity },
+    { to: '/admin/audit-timeline', label: 'Audit timeline', icon: GitCommitHorizontal },
     { to: '/admin/whatsapp-log', label: 'WhatsApp log', icon: ReceiptText },
+    ...(import.meta.env.VITE_DEMO_MODE === 'true' ? [{ to: '/admin/db-permissions', label: 'DB permissions demo', icon: Database }] : []),
   ],
   CASHIER: [{ to: '/pos', label: 'Point of sale', icon: ReceiptText, end: true }, { to: '/pos/invoices', label: "Today's invoices", icon: FileText }],
   CUSTOMER: [{ to: '/portal', label: 'My account', icon: LayoutDashboard, end: true }],

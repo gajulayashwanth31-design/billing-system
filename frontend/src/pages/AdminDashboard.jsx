@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Activity, ArrowRight, Boxes, CircleDollarSign, FileCheck2, Package, UserRound } from 'lucide-react'
+import { Activity, ArrowRight, Boxes, CircleDollarSign, Download, FileCheck2, Package, UserRound } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import {
   Bar, BarChart, CartesianGrid, Cell, Line, LineChart, Pie, PieChart, ResponsiveContainer,
@@ -7,7 +7,7 @@ import {
 } from 'recharts'
 import toast from 'react-hot-toast'
 import api from '../api/client'
-import { Card, PageHeader, Skeleton, StatCard } from '../components/UI'
+import { Button, Card, PageHeader, Skeleton, StatCard } from '../components/UI'
 import { dateOnly, money } from '../utils/format'
 
 const chartColors = ['#3e755e', '#d5a34b', '#7a8c79', '#d1775f', '#6e7894']
@@ -31,7 +31,7 @@ export default function AdminDashboard() {
       api.get('/reports/payment-split'),
       api.get('/reports/top-products', { params: { limit: 5 } }),
       api.get('/reports/top-cashiers', { params: { limit: 5 } }),
-      api.get('/reports/low-stock', { params: { limit: 6 } }),
+      api.get('/reports/low-stock', { params: { limit: 100 } }),
     ]).then(([a, b, c, d, e, f, g]) => {
       setSummary(a.data.data)
       setSales([...b.data.data].reverse().map((row) => ({ ...row, day: dateOnly(row.sale_date) })))
@@ -44,9 +44,29 @@ export default function AdminDashboard() {
       .finally(() => setLoading(false))
   }, [])
 
+  function downloadReorderCsv() {
+    const columns = ['SKU', 'Product', 'Quantity', 'Reorder level']
+    const escapeCell = (value) => {
+      let text = String(value ?? '')
+      if (/^\s*[=+\-@]/.test(text)) text = `'${text}`
+      return `"${text.replaceAll('"', '""')}"`
+    }
+    const rows = lowStock.map((item) => [item.sku, item.name, item.quantity, item.reorder_level])
+    const csv = [columns, ...rows].map((row) => row.map(escapeCell).join(',')).join('\r\n')
+    const objectUrl = window.URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
+    const link = document.createElement('a')
+    link.href = objectUrl
+    link.download = 'low-stock-reorder-list.csv'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.setTimeout(() => window.URL.revokeObjectURL(objectUrl), 1000)
+  }
+
   return <div className="dashboard-page">
     <PageHeader title="Good morning." description="Here's what's happening across your store today." action={<span className="date-pill"><Activity size={15} /> {reportDate.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' })}</span>} />
     {loading ? <Skeleton rows={6} /> : summary && <>
+      {lowStock.length > 0 && <Card className="low-stock-banner"><div><span className="eyebrow">INVENTORY ALERT</span><strong>{lowStock.length} product{lowStock.length === 1 ? '' : 's'} need restocking</strong><span>Review stock levels and prepare a reorder.</span></div><Button variant="secondary" onClick={downloadReorderCsv}><Download size={15} /> Download reorder list (CSV)</Button></Card>}
       <div className="stats-grid">
         <StatCard label="Today's sales" value={money(summary.todaySales)} detail="Paid invoices today" icon={CircleDollarSign} tone="mint" />
         <StatCard label="Invoices today" value={summary.invoicesToday} detail={summary.topCashier ? `Top cashier: ${summary.topCashier.username}` : 'No sales recorded yet'} icon={FileCheck2} tone="sand" />

@@ -30,14 +30,16 @@
 - [x] Database regression tests — PASS: `mysql --protocol=TCP -h 127.0.0.1 -P 3307 -u root billing_db --execute="source E:/Projects/billing-system/database/tests.sql"` (all 9 checks passed).
 
 ## Phase 4: Invoice PDF, WhatsApp Delivery and Demo-Wow Features
-- [ ] Paying an invoice at the POS produces a PDF and a `whatsapp_messages` row
-- [ ] With `WHATSAPP_PROVIDER=mock` the full flow works offline
-- [ ] With Twilio sandbox + ngrok, a real WhatsApp message with the PDF arrives on a joined phone
-- [ ] A failed send retries up to 3 times and shows FAILED in the UI; payment still succeeds
-- [ ] Scanning the QR in the PDF opens the verify page and shows Authentic; changing the hash shows Invalid
-- [ ] Customer can download only their own PDF (another invoice id returns 404)
-- [ ] DB Permissions Demo shows "command denied" for cashier DELETE and success for admin, and nothing is permanently changed
-- [ ] Tier discount shows identically in POS preview, saved invoice, and PDF
+- [x] Paying an invoice at the POS produces a PDF and a `whatsapp_messages` row — PASS: live invoice 29 payment generated its PDF and a SENT notification row.
+- [x] With `WHATSAPP_PROVIDER=mock` the full flow works offline — PASS: invoice 29 completed with the mock provider, one send attempt, and no Twilio credentials.
+- [ ] With Twilio sandbox + ngrok, a real WhatsApp message with the PDF arrives on a joined phone — BLOCKED: requires `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`, a public `PUBLIC_BASE_URL`, and a joined sandbox handset.
+- [x] A failed send retries up to 3 times and shows FAILED in the UI; payment still succeeds — PASS: `cd backend; npm test -- --runInBand` (21 tests) covered retries/payment isolation; browser invoice detail showed FAILED with the simulated provider error.
+- [x] Scanning the QR in the PDF opens the verify page and shows Authentic; changing the hash shows Invalid — PASS: verification API accepted the authentic HMAC and rejected a modified hash; signed PDF returned 200 and tampered signature returned 403.
+- [x] Customer can download only their own PDF (another invoice id returns 404) — PASS: customer PDF request returned 200 for an owned invoice and 404 for another customer's invoice.
+- [x] DB Permissions Demo shows "command denied" for cashier DELETE and success for admin, and nothing is permanently changed — PASS: browser demo showed the MySQL denial/success and rollback behavior.
+- [x] Tier discount shows identically in POS preview, saved invoice, and PDF — PASS: POS and saved invoice showed coupon ₹22.40, Silver discount ₹8.51, total ₹417.09; PDF generation uses the same persisted totals.
+- [x] Audit timeline and low-stock feature — PASS: audit entries rendered in the timeline; low-stock banner/CSV action appeared when product 1 was temporarily set to zero, then its original stock (38) was restored.
+- [x] Backend lint/tests, frontend lint/build, and database regression checks — PASS: backend lint; all 21 Jest tests; frontend lint/build; all 10 SQL checks. Frontend has existing lint warnings and Vite's large-chunk advisory only.
 
 ## Phase 5: Tests, Docker, Docs and Demo Script
 - [ ] `npm test` passes in backend

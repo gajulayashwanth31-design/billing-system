@@ -39,11 +39,16 @@ Files: `index.js` (provider selector), `TwilioProvider.js`, `MockProvider.js`, `
 6. **Optional bonus**: inbound WhatsApp webhook; if a customer texts "BILL", reply with their latest invoice PDF; "POINTS" replies with loyalty points.
 
 ## Acceptance checklist
-- [ ] Paying an invoice at the POS produces a PDF and a `whatsapp_messages` row
-- [ ] With `WHATSAPP_PROVIDER=mock` the full flow works offline
-- [ ] With Twilio sandbox + ngrok, a real WhatsApp message with the PDF arrives on a joined phone
-- [ ] A failed send retries up to 3 times and shows FAILED in the UI; payment still succeeds
-- [ ] Scanning the QR in the PDF opens the verify page and shows Authentic; changing the hash shows Invalid
-- [ ] Customer can download only their own PDF (another invoice id returns 404)
-- [ ] DB Permissions Demo shows "command denied" for cashier DELETE and success for admin, and nothing is permanently changed
-- [ ] Tier discount shows identically in POS preview, saved invoice, and PDF
+- [x] Paying an invoice at the POS produces a PDF and a `whatsapp_messages` row — PASS: live POS payment created invoice 29; its PDF was generated and its notification row reached SENT.
+- [x] With `WHATSAPP_PROVIDER=mock` the full flow works offline — PASS: the live mock-provider flow completed without Twilio credentials; invoice 29's notification reached SENT on attempt 1.
+- [ ] With Twilio sandbox + ngrok, a real WhatsApp message with the PDF arrives on a joined phone — BLOCKED: this environment has no Twilio credentials, public ngrok URL, or joined sandbox handset. To verify, configure `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_WHATSAPP_FROM`, `PUBLIC_BASE_URL`, and a joined phone.
+- [x] A failed send retries up to 3 times and shows FAILED in the UI; payment still succeeds — PASS: `cd backend; npm test -- --runInBand` (21 tests) verifies four total attempts and payment success when notification queuing fails; the live admin invoice detail rendered FAILED and the simulated failure text.
+- [x] Scanning the QR in the PDF opens the verify page and shows Authentic; changing the hash shows Invalid — PASS: public verification accepted the invoice's authentic HMAC and rejected a tampered hash; signed PDF returned 200 and a tampered signature returned 403.
+- [x] Customer can download only their own PDF (another invoice id returns 404) — PASS: authenticated customer PDF request returned 200 for their invoice and 404 for another customer's invoice; admin and signed PDF requests also returned valid PDFs.
+- [x] DB Permissions Demo shows "command denied" for cashier DELETE and success for admin, and nothing is permanently changed — PASS: browser demo displayed the real cashier MySQL denial and admin success; both demo transactions rolled back.
+- [x] Tier discount shows identically in POS preview, saved invoice, and PDF — PASS: POS and saved invoice showed coupon ₹22.40, Silver 2% discount ₹8.51, and total ₹417.09; PDF generation uses those saved invoice discount fields.
+
+Additional feature checks:
+- Audit timeline rendered invoice/stock audit entries in the admin browser.
+- Low-stock banner and CSV action rendered after setting product 1 to zero stock; the original quantity (38) was restored after the check.
+- `cd backend; npm run lint`, `cd frontend; npm run lint; npm run build`, and `database/tests.sql` all passed. Frontend lint/build report existing lint warnings and a large-chunk advisory only.

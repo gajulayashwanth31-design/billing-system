@@ -68,6 +68,23 @@ async function withActorTransaction(role, userId, callback) {
   });
 }
 
+async function withRolledBackTransaction(role, callback) {
+  const connection = await getPool(role).getConnection();
+  try {
+    await connection.beginTransaction();
+    return await callback(connection);
+  } finally {
+    try {
+      await connection.rollback();
+    } catch (error) {
+      console.error(`${role} demo transaction rollback failed:`, error);
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+}
+
 async function callCreateInvoice(
   role,
   customerId,
@@ -140,6 +157,7 @@ module.exports = {
   getPool,
   pingPools,
   query,
+  withRolledBackTransaction,
   withActorTransaction,
   withTransaction,
 };

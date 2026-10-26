@@ -1,6 +1,7 @@
 const { callCreateInvoice, callRecordPayment, query } = require("../config/db");
-const { notFound } = require("../utils/errors");
+const { HttpError, notFound } = require("../utils/errors");
 const invoiceNotifier = require("../services/invoiceNotifier");
+const pdfService = require("../services/pdfService");
 
 async function invoiceDetail(role, invoiceId, user) {
   const rowScope =
@@ -25,6 +26,9 @@ async function invoiceDetail(role, invoiceId, user) {
             i.cashier_id AS cashierId, i.status, i.created_at AS createdAt,
             c.name AS customerName, c.phone AS customerPhone ${cashierSelect},
             t.subtotal, t.tax, t.discount_amount AS discountAmount,
+            t.coupon_discount_amount AS couponDiscountAmount,
+            t.tier_discount_amount AS tierDiscountAmount,
+            i.tier_discount_percent AS tierDiscountPercent,
             t.grand_total AS grandTotal, t.paid_amount AS paidAmount, t.balance
      FROM invoices i
      JOIN customers c ON c.customer_id = i.customer_id
@@ -53,7 +57,8 @@ async function invoiceDetail(role, invoiceId, user) {
     ),
     query(
       role,
-      `SELECT msg_id AS id, status, provider_message_id AS providerMessageId, error, attempts, updated_at AS updatedAt
+      `SELECT msg_id AS id, status, provider_message_id AS providerMessageId,
+              error, attempts, updated_at AS updatedAt
        FROM whatsapp_messages WHERE invoice_id = ? ORDER BY created_at DESC, msg_id DESC LIMIT 1`,
       [invoiceId],
     ),
@@ -178,7 +183,11 @@ async function addPayment(req, res) {
     [id],
   );
   if (statusRows[0].status === "PAID") {
-    await invoiceNotifier.afterInvoicePaid(id);
+    await invoiceNotifier
+      .afterInvoicePaid(id)
+      .catch((error) =>
+        console.error(`Invoice ${id} notification could not be queued:`, error),
+      );
   }
   return res.status(201).json({
     message: "Payment recorded successfully",
@@ -206,22 +215,47 @@ async function voidInvoice(req, res) {
   });
 }
 
-async function pdfPlaceholder(req, res) {
-  await invoiceDetail(req.user.role, req.validated.params.id, req.user);
-  return res.status(501).json({
-    error: {
-      code: "NOT_IMPLEMENTED",
-      message: "PDF generation is scheduled for Phase 4",
+async function downloadPdf(req, res, next) {
+  const invoice = await invoiceDetail(
+    req.user.role,
+    req.validated.params.id,
+    req.user,
+  );
+  const generated = await pdfService.generateInvoicePdf(invoice.id);
+  res.setHeader("Cache-Control", "private, no-store");
+  return res.download(
+    generated.path,
+    `${invoice.invoiceNo}.pdf`,
+    (error) => {
+      if (error && !res.headersSent) next(error);
+      else if (error) console.error("Invoice PDF stream failed:", error);
     },
-  });
+  );
 }
 
-async function resendPlaceholder(req, res) {
-  await invoiceDetail(req.user.role, req.validated.params.id, req.user);
-  return res.status(501).json({
-    error: {
-      code: "NOT_IMPLEMENTED",
-      message: "WhatsApp delivery is scheduled for Phase 4",
+async function resendWhatsApp(req, res) {
+  const invoice = await invoiceDetail(
+    req.user.role,
+    req.validated.params.id,
+    req.user,
+  );
+  if (invoice.status !== "PAID") {
+    throw new HttpError(
+      409,
+      "INVOICE_NOT_PAID",
+      "Only paid invoices can be sent by WhatsApp",
+    );
+  }
+  const messageId = await invoiceNotifier.afterInvoicePaid(invoice.id);
+  const updatedInvoice = await invoiceDetail(
+    req.user.role,
+    invoice.id,
+    req.user,
+  );
+  return res.status(202).json({
+    data: {
+      messageId,
+      status: updatedInvoice.whatsapp?.status || "UNAVAILABLE",
     },
   });
 }
@@ -232,7 +266,7 @@ module.exports = {
   getById,
   invoiceDetail,
   list,
-  pdfPlaceholder,
-  resendPlaceholder,
+  downloadPdf,
+  resendWhatsApp,
   voidInvoice,
 };

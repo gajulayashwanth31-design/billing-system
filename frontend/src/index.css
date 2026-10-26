@@ -384,6 +384,57 @@ tbody tr:hover { background: color-mix(in srgb, var(--card-soft) 68%, transparen
 .stock-callout small { color: var(--text-muted); font-size: 9px; }
 .stock-callout-count { color: var(--amber); font-size: 10px; font-weight: 700; }
 .audit-value { max-width: 280px; display: inline-block; overflow: hidden; color: var(--text-muted); text-overflow: ellipsis; vertical-align: middle; }
+.sidebar nav { overflow-y: auto; scrollbar-width: thin; }
+.low-stock-banner { margin-bottom: 15px; padding: 17px 19px; display: flex; align-items: center; justify-content: space-between; gap: 15px; border-color: #ead9b8; background: linear-gradient(105deg, var(--card), #fbf7ee); }
+.low-stock-banner > div { display: grid; gap: 5px; }
+.low-stock-banner > div > strong { font-size: 13px; }
+.low-stock-banner > div > span:last-child { color: var(--text-muted); font-size: 10px; }
+.permissions-demo-card { padding: 19px; }
+.permissions-demo-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; }
+.permissions-demo-controls label { min-width: 190px; display: grid; gap: 5px; color: var(--text-muted); font-size: 10px; font-weight: 700; }
+.permissions-demo-controls select { min-height: 38px; padding: 0 10px; color: var(--text); background: var(--card); border: 1px solid var(--border-strong); border-radius: 6px; }
+.permissions-demo-note { margin: 14px 0 17px; color: var(--text-muted); font-size: 11px; line-height: 1.6; }
+.permissions-result-table { width: 100%; border-collapse: collapse; }
+.permissions-result-table th, .permissions-result-table td { padding: 12px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); font-size: 10px; }
+.permissions-result-table th { color: var(--text-faint); font-size: 9px; letter-spacing: .6px; text-transform: uppercase; }
+.permission-allowed { color: var(--green-dark); }
+.permission-denied { color: var(--red); overflow-wrap: anywhere; }
+.permissions-empty { color: var(--text-muted); text-align: center !important; }
+.audit-timeline { max-width: 980px; margin-left: 8px; padding-left: 25px; border-left: 2px solid var(--border-strong); }
+.audit-timeline-entry { position: relative; padding-bottom: 16px; }
+.audit-timeline-marker { position: absolute; top: 17px; left: -35px; width: 20px; height: 20px; display: grid; place-items: center; color: var(--green); background: var(--app-bg); border: 1px solid var(--border-strong); border-radius: 50%; }
+.audit-timeline-card { padding: 16px 18px; }
+.audit-timeline-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.audit-timeline-heading > div { display: grid; gap: 4px; }
+.audit-timeline-heading strong { font-size: 12px; }
+.audit-timeline-heading span { color: var(--text-muted); font-size: 10px; }
+.audit-timeline-card > p { margin: 12px 0; color: var(--text-muted); font-size: 10px; }
+.audit-timeline-values { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.audit-timeline-values > div { min-width: 0; padding: 10px; border-radius: 7px; }
+.audit-timeline-values span { font-size: 8px; font-weight: 800; letter-spacing: .8px; }
+.audit-timeline-values pre { max-height: 115px; margin: 7px 0 0; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 10px/1.5 'Consolas', monospace; color: var(--text); }
+.audit-value-before { background: color-mix(in srgb, var(--red) 7%, var(--card)); border: 1px solid color-mix(in srgb, var(--red) 18%, var(--border)); }
+.audit-value-before span { color: var(--red); }
+.audit-value-after { background: color-mix(in srgb, var(--green) 8%, var(--card)); border: 1px solid color-mix(in srgb, var(--green) 20%, var(--border)); }
+.audit-value-after span { color: var(--green-dark); }
+.audit-timeline-empty { padding: 35px; color: var(--text-muted); text-align: center; }
+.verify-screen { min-height: 100vh; padding: 36px 18px; display: grid; align-content: center; justify-items: center; gap: 18px; background: var(--app-bg); }
+.verify-brand { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 800; }
+.verify-brand > span { width: 34px; height: 34px; display: grid; place-items: center; color: white; background: var(--green); border-radius: 10px; }
+.verify-brand small { margin-left: 4px; color: var(--text-faint); font-size: 8px; letter-spacing: 1px; }
+.verify-card { width: min(100%, 490px); padding: 32px; display: grid; justify-items: center; gap: 11px; color: var(--text-muted); background: var(--card); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); text-align: center; }
+.verify-card > svg { color: var(--text-muted); }
+.verify-valid > svg { color: var(--green); }
+.verify-invalid > svg { color: var(--red); }
+.verify-card h1 { margin: 0; color: var(--text); font: 700 24px Manrope, sans-serif; }
+.verify-shop { margin: 0; color: var(--text-muted); font-size: 12px; }
+.verify-details { width: 100%; margin: 10px 0; padding: 15px; display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; border: 1px solid var(--border); border-radius: 9px; text-align: left; }
+.verify-details span { color: var(--text-muted); font-size: 10px; }
+.verify-details strong { color: var(--text); font-size: 10px; text-align: right; }
+.verify-note { margin: 0; font-size: 11px; line-height: 1.6; }
+.verify-footer { color: var(--text-faint); font-size: 10px; }
+.pdf-download { display: inline-flex; align-items: center; gap: 4px; padding: 4px 6px; color: var(--green-dark); background: transparent; border: 0; border-radius: 5px; font-size: 9px; font-weight: 700; cursor: pointer; }
+.pdf-download:hover { background: var(--green-pale); }
 .log-heading-icon { color: var(--green); background: var(--green-pale); border: 0; }
 
 .portal-page { max-width: 1180px; }
@@ -527,6 +578,15 @@ tbody tr:hover { background: color-mix(in srgb, var(--card-soft) 68%, transparen
   .detail-actions { width: 100%; flex-wrap: wrap; }
   .detail-actions .button { flex: 1; }
   .invoice-side-column { grid-template-columns: 1fr; }
+  .low-stock-banner { align-items: flex-start; flex-direction: column; }
+  .low-stock-banner .button { width: 100%; }
+  .permissions-demo-controls { align-items: stretch; flex-direction: column; }
+  .permissions-demo-controls label { min-width: 0; }
+  .audit-timeline { margin-left: 1px; padding-left: 18px; }
+  .audit-timeline-marker { left: -28px; }
+  .audit-timeline-card { padding: 13px; }
+  .audit-timeline-values { grid-template-columns: 1fr; }
+  .verify-card { padding: 23px 18px; }
   .invoice-main-column { min-width: 0; }
   .invoice-info-card, .payments-card { padding: 13px; }
   .success-card { padding: 23px 17px; }

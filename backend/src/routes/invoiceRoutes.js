@@ -60,13 +60,13 @@ router.get(
   "/:id/pdf",
   authorize("CUSTOMER", "CASHIER", "ADMIN"),
   validate(z.object({ params: idParam })),
-  asyncHandler(controller.pdfPlaceholder),
+  asyncHandler(controller.downloadPdf),
 );
 router.post(
   "/:id/resend-whatsapp",
   authorize("CASHIER", "ADMIN"),
   validate(z.object({ params: idParam })),
-  asyncHandler(controller.resendPlaceholder),
+  asyncHandler(controller.resendWhatsApp),
 );
 router.post(
   "/:id/void",

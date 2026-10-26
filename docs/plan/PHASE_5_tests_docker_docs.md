@@ -57,8 +57,8 @@ Check and fix:
 - Tag the repo `v1.0-demo`.
 
 ## Acceptance checklist
-- [ ] `npm test` passes in backend
-- [ ] `docker compose up --build` gives a working app with seeded data
-- [ ] README lets a new person run the project in under 10 minutes
-- [ ] Demo script rehearsed once end to end with real WhatsApp and once with mock
-- [ ] No secrets committed; `.env.example` complete
+- [x] `npm test` passes in backend — PASS: `cd backend; $env:TEST_DB_PORT='3307'; npm test` rebuilt the isolated `billing_test`; SQL regressions passed 10/10 and Jest passed 7 suites / 39 tests.
+- [ ] `docker compose up --build` gives a working app with seeded data — BLOCKED: `docker compose config --quiet` passed with temporary validation environment values, but `docker compose up --build` could not connect to `npipe:////./pipe/dockerDesktopLinuxEngine`; Docker Desktop/engine is unavailable in this environment.
+- [ ] README lets a new person run the project in under 10 minutes — NOT VERIFIED: setup paths, commands, environment variables, seeded credentials, and troubleshooting are documented in `README.md`, but a fresh-clone timed run was not performed.
+- [ ] Demo script rehearsed once end to end with real WhatsApp and once with mock — PARTIAL / BLOCKED: the mock invoice-to-PDF/notification flow was exercised in Phase 4 and covered by the Phase 5 automated tests; a complete timed rehearsal of this script and real handset delivery remain unverified. Real delivery needs Twilio credentials, public HTTPS URLs, and a joined sandbox handset.
+- [x] No secrets committed; `.env.example` complete — PASS: the tracked-file scan found no credential patterns or tracked `.env` files; `.env.example`, `backend/.env.example`, and `frontend/.env.example` provide the Compose, backend, and frontend settings; ignore rules cover `.env`, `backend/storage/`, and `dist/`.

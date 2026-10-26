@@ -1,7 +1,4 @@
-const {
-  query,
-  withActorTransaction,
-} = require("../config/db");
+const { query, withActorTransaction } = require("../config/db");
 const { notFound } = require("../utils/errors");
 
 function list(resource, role) {

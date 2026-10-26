@@ -5,12 +5,11 @@ const PDFDocument = require("pdfkit");
 const QRCode = require("qrcode");
 const { query } = require("../config/db");
 const { notFound } = require("../utils/errors");
-const {
-  createInvoiceHash,
-  createSignedPdfUrl,
-} = require("./invoiceSigning");
+const { createInvoiceHash, createSignedPdfUrl } = require("./invoiceSigning");
 
-const invoiceStorage = path.join(__dirname, "..", "..", "storage", "invoices");
+const invoiceStorage =
+  process.env.INVOICE_STORAGE_DIR ||
+  path.join(__dirname, "..", "..", "storage", "invoices");
 
 function formatMoney(value) {
   return `INR ${Number(value || 0).toLocaleString("en-IN", {
@@ -199,7 +198,11 @@ async function renderInvoicePdf(invoice) {
         align: "right",
       });
     y += 25;
-    document.moveTo(48, y - 7).lineTo(547, y - 7).strokeColor("#edf0ed").stroke();
+    document
+      .moveTo(48, y - 7)
+      .lineTo(547, y - 7)
+      .strokeColor("#edf0ed")
+      .stroke();
   }
   if (y + 160 > 770) {
     document.addPage();
@@ -211,7 +214,9 @@ async function renderInvoicePdf(invoice) {
   if (Number(invoice.couponDiscountAmount) > 0) {
     drawTotalsRow(
       document,
-      invoice.discountCode ? `Coupon (${invoice.discountCode})` : "Coupon discount",
+      invoice.discountCode
+        ? `Coupon (${invoice.discountCode})`
+        : "Coupon discount",
       `− ${formatMoney(invoice.couponDiscountAmount)}`,
     );
   }
@@ -225,7 +230,11 @@ async function renderInvoicePdf(invoice) {
   drawTotalsRow(document, "Grand total", formatMoney(invoice.grandTotal), {
     bold: true,
   });
-  drawTotalsRow(document, `Paid · ${invoice.payments.map((payment) => payment.method).join(", ") || "Unpaid"}`, formatMoney(invoice.paidAmount));
+  drawTotalsRow(
+    document,
+    `Paid · ${invoice.payments.map((payment) => payment.method).join(", ") || "Unpaid"}`,
+    formatMoney(invoice.paidAmount),
+  );
   if (Number(invoice.balance) > 0) {
     drawTotalsRow(document, "Balance due", formatMoney(invoice.balance), {
       bold: true,

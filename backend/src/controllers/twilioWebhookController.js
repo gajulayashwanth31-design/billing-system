@@ -14,7 +14,11 @@ function isValidSignature(req) {
 
 async function status(req, res) {
   if (!isValidSignature(req)) {
-    throw new HttpError(403, "TWILIO_SIGNATURE_INVALID", "Twilio signature validation failed");
+    throw new HttpError(
+      403,
+      "TWILIO_SIGNATURE_INVALID",
+      "Twilio signature validation failed",
+    );
   }
   const { MessageSid, MessageStatus, ErrorMessage } = req.validated.body;
   const normalizedStatus =

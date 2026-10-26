@@ -7,6 +7,10 @@ function createTwilioProvider() {
     throw new Error("Twilio WhatsApp credentials are incomplete");
   }
   const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+  const publicBaseUrl = (process.env.PUBLIC_BASE_URL || "").replace(/\/+$/, "");
+  const statusCallback = publicBaseUrl
+    ? `${publicBaseUrl}/api/webhooks/twilio/status`
+    : undefined;
 
   return {
     async sendText(to, text) {
@@ -14,6 +18,7 @@ function createTwilioProvider() {
         from: TWILIO_WHATSAPP_FROM,
         to: `whatsapp:${to}`,
         body: text,
+        ...(statusCallback ? { statusCallback } : {}),
       });
       return { providerMessageId: message.sid, status: "SENT" };
     },
@@ -23,6 +28,7 @@ function createTwilioProvider() {
         to: `whatsapp:${to}`,
         body: caption,
         mediaUrl: [mediaUrl],
+        ...(statusCallback ? { statusCallback } : {}),
       });
       return { providerMessageId: message.sid, status: "SENT" };
     },

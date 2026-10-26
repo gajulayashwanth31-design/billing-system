@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "oxlint",
+    "lint": "eslint src && oxlint",
+    "format": "prettier --write \"src/**/*.{js,jsx,css}\" eslint.config.js --single-quote --no-semi --trailing-comma all --print-width 120",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,css}\" eslint.config.js --single-quote --no-semi --trailing-comma all --print-width 120",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -23,8 +25,10 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "autoprefixer": "^10.6.1",
+    "eslint": "^10.13.0",
     "oxlint": "^1.88.0",
     "postcss": "^8.5.31",
+    "prettier": "^3.9.10",
     "tailwindcss": "^3.4.19",
     "vite": "^8.3.4"
   }

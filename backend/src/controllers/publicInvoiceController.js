@@ -1,6 +1,9 @@
 const { query } = require("../config/db");
 const { generateInvoicePdf } = require("../services/pdfService");
-const { isInvoiceHashValid, isSignedPdfRequestValid } = require("../services/invoiceSigning");
+const {
+  isInvoiceHashValid,
+  isSignedPdfRequestValid,
+} = require("../services/invoiceSigning");
 const { notFound, HttpError } = require("../utils/errors");
 
 async function verify(req, res) {
@@ -42,7 +45,11 @@ async function signedPdf(req, res, next) {
   const { exp, sig } = req.validated.query;
   const now = Math.floor(Date.now() / 1000);
   if (!isSignedPdfRequestValid(invoiceNo, exp, sig, now)) {
-    throw new HttpError(403, "SIGNED_URL_INVALID", "This invoice link is invalid or expired");
+    throw new HttpError(
+      403,
+      "SIGNED_URL_INVALID",
+      "This invoice link is invalid or expired",
+    );
   }
   const rows = await query(
     "ADMIN",

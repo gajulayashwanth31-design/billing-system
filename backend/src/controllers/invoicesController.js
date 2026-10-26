@@ -223,14 +223,10 @@ async function downloadPdf(req, res, next) {
   );
   const generated = await pdfService.generateInvoicePdf(invoice.id);
   res.setHeader("Cache-Control", "private, no-store");
-  return res.download(
-    generated.path,
-    `${invoice.invoiceNo}.pdf`,
-    (error) => {
-      if (error && !res.headersSent) next(error);
-      else if (error) console.error("Invoice PDF stream failed:", error);
-    },
-  );
+  return res.download(generated.path, `${invoice.invoiceNo}.pdf`, (error) => {
+    if (error && !res.headersSent) next(error);
+    else if (error) console.error("Invoice PDF stream failed:", error);
+  });
 }
 
 async function resendWhatsApp(req, res) {

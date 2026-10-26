@@ -1,4 +1,4 @@
-process.env.JWT_SECRET = "phase-two-test-secret-with-more-than-32-characters";
+process.env.JWT_SECRET ||= require("crypto").randomBytes(48).toString("hex");
 
 const jwt = require("jsonwebtoken");
 const request = require("supertest");

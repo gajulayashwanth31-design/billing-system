@@ -8,10 +8,13 @@ export function ThemeProvider({ children }) {
     document.documentElement.dataset.theme = theme
     localStorage.setItem('billing-theme', theme)
   }, [theme])
-  const value = useMemo(() => ({
-    theme,
-    toggleTheme: () => setTheme((current) => current === 'light' ? 'dark' : 'light'),
-  }), [theme])
+  const value = useMemo(
+    () => ({
+      theme,
+      toggleTheme: () => setTheme((current) => (current === 'light' ? 'dark' : 'light')),
+    }),
+    [theme],
+  )
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
 

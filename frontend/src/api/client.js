@@ -19,10 +19,11 @@ client.interceptors.response.use(
       localStorage.removeItem('billing-user')
       if (window.location.pathname !== '/login') window.location.assign('/login')
     }
-    const message = error.response?.data?.error?.message
-      || error.response?.data?.message
-      || error.message
-      || 'The request could not be completed.'
+    const message =
+      error.response?.data?.error?.message ||
+      error.response?.data?.message ||
+      error.message ||
+      'The request could not be completed.'
     return Promise.reject(Object.assign(error, { userMessage: message }))
   },
 )

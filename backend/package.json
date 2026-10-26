@@ -21,12 +21,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --runInBand",
+    "test": "node scripts/run-tests.js",
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "lint": "eslint src server.js",
-    "format": "prettier --write src server.js tests eslint.config.js",
-    "format:check": "prettier --check src server.js tests eslint.config.js"
+    "lint": "eslint src server.js scripts tests eslint.config.js",
+    "format": "prettier --write src server.js scripts tests eslint.config.js",
+    "format:check": "prettier --check src server.js scripts tests eslint.config.js"
   },
   "keywords": [],
   "author": "",

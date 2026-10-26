@@ -42,7 +42,11 @@ app.use(
 );
 app.use(express.urlencoded({ extended: false, limit: "32kb" }));
 app.use(express.json({ limit: "1mb" }));
-app.use(morgan("combined"));
+app.use(
+  morgan("combined", {
+    skip: () => process.env.NODE_ENV === "test",
+  }),
+);
 
 app.get("/health", (req, res) => res.json({ status: "ok" }));
 app.get("/api-docs.json", (req, res) => res.json(openapiDocument));

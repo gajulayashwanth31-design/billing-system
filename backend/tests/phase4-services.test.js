@@ -1,5 +1,6 @@
-process.env.INVOICE_SIGNING_SECRET =
-  "phase-four-test-signing-secret-with-32-characters";
+process.env.INVOICE_SIGNING_SECRET ||= require("crypto")
+  .randomBytes(48)
+  .toString("hex");
 
 const {
   createInvoiceHash,
@@ -46,12 +47,7 @@ describe("invoice links and verification signatures", () => {
     const signature = url.searchParams.get("sig");
     expect(expiresAt).toBe(now + 1800);
     expect(
-      isSignedPdfRequestValid(
-        "INV-2026-00000001",
-        expiresAt,
-        signature,
-        now,
-      ),
+      isSignedPdfRequestValid("INV-2026-00000001", expiresAt, signature, now),
     ).toBe(true);
     expect(
       isSignedPdfRequestValid(
@@ -62,7 +58,12 @@ describe("invoice links and verification signatures", () => {
       ),
     ).toBe(false);
     expect(
-      isSignedPdfRequestValid("INV-2026-00000001", expiresAt, signature, expiresAt),
+      isSignedPdfRequestValid(
+        "INV-2026-00000001",
+        expiresAt,
+        signature,
+        expiresAt,
+      ),
     ).toBe(false);
   });
 });

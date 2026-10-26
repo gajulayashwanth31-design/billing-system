@@ -7,14 +7,23 @@ const maxAttempts = 4;
 const retryDelays = [2000, 4000, 8000];
 
 function wait(milliseconds) {
-  return new Promise((resolve) => require("timers").setTimeout(resolve, milliseconds));
+  return new Promise((resolve) =>
+    require("timers").setTimeout(resolve, milliseconds),
+  );
 }
 
 function logDeliveryFailure(invoiceId, error) {
   console.error(`Invoice ${invoiceId} WhatsApp delivery failed:`, error);
 }
 
-async function deliver(messageId, invoiceId, phone, invoiceNo, total, itemCount) {
+async function deliver(
+  messageId,
+  invoiceId,
+  phone,
+  invoiceNo,
+  total,
+  itemCount,
+) {
   let lastError;
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     await query(
@@ -36,7 +45,9 @@ async function deliver(messageId, invoiceId, phone, invoiceNo, total, itemCount)
         `Invoice ${invoiceNo}`,
       );
       if (!documentResult.providerMessageId) {
-        throw new Error("WhatsApp provider did not return a document message ID");
+        throw new Error(
+          "WhatsApp provider did not return a document message ID",
+        );
       }
       await query(
         "CASHIER",
@@ -57,7 +68,10 @@ async function deliver(messageId, invoiceId, phone, invoiceNo, total, itemCount)
   await query(
     "CASHIER",
     "UPDATE whatsapp_messages SET status = 'FAILED', error = ? WHERE msg_id = ?",
-    [String(lastError?.message || "WhatsApp delivery failed").slice(0, 2000), messageId],
+    [
+      String(lastError?.message || "WhatsApp delivery failed").slice(0, 2000),
+      messageId,
+    ],
   );
   logDeliveryFailure(invoiceId, lastError);
 }

@@ -38,17 +38,100 @@ export default function LoginPage() {
     }
   }
 
-  return <main className="login-screen"><div className="login-decoration decoration-one" /><div className="login-decoration decoration-two" />
-    <section className="login-card"><div className="login-brand"><span className="brand-mark"><ReceiptText size={20} /></span><span>ledger<span className="brand-light">line</span></span><span className="login-tag">BILLING SUITE</span></div>
-      <div className="login-heading"><span className="eyebrow"><Sparkles size={14} /> YOUR BUSINESS, IN BALANCE</span><h1>Welcome back.</h1><p>Sign in to your workspace to continue.</p></div>
-      <form className="login-form" onSubmit={(event) => { event.preventDefault(); submit() }}>
-        <FormField label="Username" error={error && undefined}><input autoComplete="username" required value={username} onChange={(event) => setUsername(event.target.value)} placeholder="Enter your username" /></FormField>
-        <FormField label="Password"><div className="password-wrap"><LockKeyhole size={17} /><input type="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Enter your password" /></div></FormField>
-        {error && <p className="login-error" role="alert">{error}</p>}
-        <Button type="submit" disabled={busy} className="login-submit">{busy ? 'Signing in…' : 'Sign in'}<ArrowRight size={17} /></Button>
-      </form>
-      {import.meta.env.VITE_DEMO_MODE === 'true' && <div className="demo-section"><div className="demo-divider"><span>QUICK DEMO ACCESS</span></div><div className="demo-grid">{demoAccounts.map(({ label, icon: Icon, ...account }) => <button key={label} className="demo-button" disabled={busy} onClick={() => { setUsername(account.username); setPassword(account.password); submit(account) }}><Icon size={17} /><span>{label}</span><ArrowRight size={14} /></button>)}</div><p>Sample accounts are enabled for demonstration.</p></div>}
-      <div className="login-footer"><span>Protected workspace</span><span><ShieldCheck size={14} /> Secure sign-in</span></div>
-    </section><p className="login-copyright">© {currentYear} Ledgerline · Billing made clear.</p>
-  </main>
+  return (
+    <main className="login-screen">
+      <div className="login-decoration decoration-one" />
+      <div className="login-decoration decoration-two" />
+      <section className="login-card">
+        <div className="login-brand">
+          <span className="brand-mark">
+            <ReceiptText size={20} />
+          </span>
+          <span>
+            ledger<span className="brand-light">line</span>
+          </span>
+          <span className="login-tag">BILLING SUITE</span>
+        </div>
+        <div className="login-heading">
+          <span className="eyebrow">
+            <Sparkles size={14} /> YOUR BUSINESS, IN BALANCE
+          </span>
+          <h1>Welcome back.</h1>
+          <p>Sign in to your workspace to continue.</p>
+        </div>
+        <form
+          className="login-form"
+          onSubmit={(event) => {
+            event.preventDefault()
+            submit()
+          }}
+        >
+          <FormField label="Username" error={error && undefined}>
+            <input
+              autoComplete="username"
+              required
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+              placeholder="Enter your username"
+            />
+          </FormField>
+          <FormField label="Password">
+            <div className="password-wrap">
+              <LockKeyhole size={17} />
+              <input
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Enter your password"
+              />
+            </div>
+          </FormField>
+          {error && (
+            <p className="login-error" role="alert">
+              {error}
+            </p>
+          )}
+          <Button type="submit" disabled={busy} className="login-submit">
+            {busy ? 'Signing in…' : 'Sign in'}
+            <ArrowRight size={17} />
+          </Button>
+        </form>
+        {import.meta.env.VITE_DEMO_MODE === 'true' && (
+          <div className="demo-section">
+            <div className="demo-divider">
+              <span>QUICK DEMO ACCESS</span>
+            </div>
+            <div className="demo-grid">
+              {demoAccounts.map(({ label, icon: Icon, ...account }) => (
+                <button
+                  key={label}
+                  className="demo-button"
+                  disabled={busy}
+                  onClick={() => {
+                    setUsername(account.username)
+                    setPassword(account.password)
+                    submit(account)
+                  }}
+                >
+                  <Icon size={17} />
+                  <span>{label}</span>
+                  <ArrowRight size={14} />
+                </button>
+              ))}
+            </div>
+            <p>Sample accounts are enabled for demonstration.</p>
+          </div>
+        )}
+        <div className="login-footer">
+          <span>Protected workspace</span>
+          <span>
+            <ShieldCheck size={14} /> Secure sign-in
+          </span>
+        </div>
+      </section>
+      <p className="login-copyright">© {currentYear} Ledgerline · Billing made clear.</p>
+    </main>
+  )
 }

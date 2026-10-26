@@ -32,7 +32,10 @@ function createInvoiceHash(invoiceNo, grandTotal, createdAt) {
 }
 
 function isInvoiceHashValid(invoiceNo, grandTotal, createdAt, suppliedHash) {
-  if (typeof suppliedHash !== "string" || !/^[a-f\d]{64}$/i.test(suppliedHash)) {
+  if (
+    typeof suppliedHash !== "string" ||
+    !/^[a-f\d]{64}$/i.test(suppliedHash)
+  ) {
     return false;
   }
   const expected = Buffer.from(
@@ -41,15 +44,15 @@ function isInvoiceHashValid(invoiceNo, grandTotal, createdAt, suppliedHash) {
   );
   const actual = Buffer.from(suppliedHash, "hex");
   return (
-    actual.length === expected.length && crypto.timingSafeEqual(actual, expected)
+    actual.length === expected.length &&
+    crypto.timingSafeEqual(actual, expected)
   );
 }
 
 function createSignedPdfUrl(invoiceNo, now = Math.floor(Date.now() / 1000)) {
-  const baseUrl = (process.env.PUBLIC_BASE_URL || "http://localhost:4000").replace(
-    /\/+$/,
-    "",
-  );
+  const baseUrl = (
+    process.env.PUBLIC_BASE_URL || "http://localhost:4000"
+  ).replace(/\/+$/, "");
   const expiresAt = now + signedUrlLifetimeSeconds;
   const signature = hmac(`${invoiceNo}|${expiresAt}`);
   return `${baseUrl}/public/invoices/${encodeURIComponent(invoiceNo)}.pdf?exp=${expiresAt}&sig=${signature}`;
@@ -68,7 +71,8 @@ function isSignedPdfRequestValid(invoiceNo, expiresAt, signature, now) {
   const expected = Buffer.from(hmac(`${invoiceNo}|${expiresAt}`), "hex");
   const actual = Buffer.from(signature, "hex");
   return (
-    actual.length === expected.length && crypto.timingSafeEqual(actual, expected)
+    actual.length === expected.length &&
+    crypto.timingSafeEqual(actual, expected)
   );
 }
 

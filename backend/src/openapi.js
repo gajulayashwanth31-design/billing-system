@@ -85,9 +85,24 @@ const endpoints = [
   ["/api/audit-log", "get", "Search the audit log", "ADMIN"],
   ["/api/whatsapp-messages", "get", "List WhatsApp delivery messages", "ADMIN"],
   ["/api/public/verify/{invoiceNo}", "get", "Verify an invoice hash", "Public"],
-  ["/public/invoices/{invoiceNo}.pdf", "get", "Download a signed public invoice PDF", "Public"],
-  ["/api/webhooks/twilio/status", "post", "Receive Twilio WhatsApp delivery status", "Public"],
-  ["/api/demo/db-permissions", "post", "Run a fixed database permissions demo action", "ADMIN"],
+  [
+    "/public/invoices/{invoiceNo}.pdf",
+    "get",
+    "Download a signed public invoice PDF",
+    "Public",
+  ],
+  [
+    "/api/webhooks/twilio/status",
+    "post",
+    "Receive Twilio WhatsApp delivery status",
+    "Public",
+  ],
+  [
+    "/api/demo/db-permissions",
+    "post",
+    "Run a fixed database permissions demo action",
+    "ADMIN",
+  ],
 ];
 
 const paths = {};

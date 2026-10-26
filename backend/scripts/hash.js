@@ -1,11 +1,11 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 const demoPasswords = {
-  admin: 'Admin@123',
-  cashier1: 'Cashier@123',
-  cashier2: 'Cashier@123',
-  priya: 'Customer@123',
-  rahul: 'Customer@123',
+  admin: "Admin@123",
+  cashier1: "Cashier@123",
+  cashier2: "Cashier@123",
+  priya: "Customer@123",
+  rahul: "Customer@123",
 };
 
 async function main() {
@@ -16,6 +16,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error('Failed to hash demo passwords:', error.message);
+  console.error("Failed to hash demo passwords:", error.message);
   process.exitCode = 1;
 });

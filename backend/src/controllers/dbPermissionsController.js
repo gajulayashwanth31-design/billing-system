@@ -16,11 +16,19 @@ const permissionErrors = new Set([
 
 async function run(req, res) {
   if (process.env.DEMO_MODE !== "true") {
-    throw new HttpError(404, "NOT_FOUND", "Database permissions demo is disabled");
+    throw new HttpError(
+      404,
+      "NOT_FOUND",
+      "Database permissions demo is disabled",
+    );
   }
   const { role, action } = req.validated.body;
   if (!knownActions.has(action)) {
-    throw new HttpError(400, "INVALID_DEMO_ACTION", "Demo action is not supported");
+    throw new HttpError(
+      400,
+      "INVALID_DEMO_ACTION",
+      "Demo action is not supported",
+    );
   }
   try {
     const result = await withRolledBackTransaction(role, async (connection) => {
@@ -97,11 +105,20 @@ async function run(req, res) {
       data: { role, action, allowed: true, result, rolledBack: true },
     });
   } catch (error) {
-    if (!permissionErrors.has(error.code) && !/command denied/i.test(error.message || "")) {
+    if (
+      !permissionErrors.has(error.code) &&
+      !/command denied/i.test(error.message || "")
+    ) {
       throw error;
     }
     return res.json({
-      data: { role, action, allowed: false, error: error.message, rolledBack: true },
+      data: {
+        role,
+        action,
+        allowed: false,
+        error: error.message,
+        rolledBack: true,
+      },
     });
   }
 }

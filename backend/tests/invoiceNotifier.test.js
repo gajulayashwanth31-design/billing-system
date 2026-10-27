@@ -29,14 +29,12 @@ describe("invoice WhatsApp delivery retry behavior", () => {
 
   test("retries transient failures three times before marking delivery SENT", async () => {
     const provider = {
-      sendText: jest
-        .fn()
-        .mockRejectedValueOnce(new Error("temporary failure"))
-        .mockRejectedValueOnce(new Error("temporary failure"))
-        .mockRejectedValueOnce(new Error("temporary failure"))
-        .mockResolvedValue({ providerMessageId: "text-1", status: "SENT" }),
+      sendText: jest.fn(),
       sendDocument: jest
         .fn()
+        .mockRejectedValueOnce(new Error("temporary failure"))
+        .mockRejectedValueOnce(new Error("temporary failure"))
+        .mockRejectedValueOnce(new Error("temporary failure"))
         .mockResolvedValue({ providerMessageId: "document-1", status: "SENT" }),
     };
     getProvider.mockReturnValue(provider);
@@ -51,8 +49,8 @@ describe("invoice WhatsApp delivery retry behavior", () => {
     );
     await completion;
 
-    expect(provider.sendText).toHaveBeenCalledTimes(4);
-    expect(provider.sendDocument).toHaveBeenCalledTimes(1);
+    expect(provider.sendText).not.toHaveBeenCalled();
+    expect(provider.sendDocument).toHaveBeenCalledTimes(4);
     expect(query).toHaveBeenCalledWith(
       "CASHIER",
       expect.stringContaining("SET status = 'SENT'"),
@@ -62,8 +60,10 @@ describe("invoice WhatsApp delivery retry behavior", () => {
 
   test("marks delivery FAILED after four unsuccessful attempts", async () => {
     const provider = {
-      sendText: jest.fn().mockRejectedValue(new Error("provider unavailable")),
-      sendDocument: jest.fn(),
+      sendText: jest.fn(),
+      sendDocument: jest
+        .fn()
+        .mockRejectedValue(new Error("provider unavailable")),
     };
     getProvider.mockReturnValue(provider);
 
@@ -77,8 +77,8 @@ describe("invoice WhatsApp delivery retry behavior", () => {
     );
     await completion;
 
-    expect(provider.sendText).toHaveBeenCalledTimes(4);
-    expect(provider.sendDocument).not.toHaveBeenCalled();
+    expect(provider.sendText).not.toHaveBeenCalled();
+    expect(provider.sendDocument).toHaveBeenCalledTimes(4);
     expect(query).toHaveBeenCalledWith(
       "CASHIER",
       expect.stringContaining("SET status = 'FAILED'"),

@@ -177,8 +177,11 @@ export default function PortalPage() {
               <FormField label="Phone number">
                 <input
                   type="tel"
+                  inputMode="tel"
                   required
-                  pattern="\\+91[6-9][0-9]{9}"
+                  maxLength={13}
+                  pattern="\+91[6-9][0-9]{9}"
+                  title="Enter +91 followed by a 10-digit Indian mobile number."
                   value={phone}
                   onChange={(event) => setPhone(event.target.value)}
                 />

@@ -733,8 +733,12 @@ export default function PosPage() {
               <FormField label="Mobile number">
                 <input
                   required
-                  pattern="\\+91[6-9][0-9]{9}"
+                  type="tel"
+                  inputMode="tel"
+                  maxLength={13}
+                  pattern="\+91[6-9][0-9]{9}"
                   placeholder="+919876543210"
+                  title="Enter +91 followed by a 10-digit Indian mobile number."
                   value={customerForm.phone}
                   onChange={(event) => setCustomerForm({ ...customerForm, phone: event.target.value })}
                 />

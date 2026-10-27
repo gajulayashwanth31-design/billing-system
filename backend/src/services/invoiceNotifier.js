@@ -35,14 +35,13 @@ async function deliver(
       const { path: pdfPath } = await pdfService.generateInvoicePdf(invoiceId);
       const mediaUrl = pdfService.createSignedPdfUrl(invoiceNo);
       const provider = getProvider();
-      const summary =
+      const caption =
         `${process.env.SHOP_NAME || "Billing System"} · Invoice ${invoiceNo} · ` +
         `INR ${Number(total).toFixed(2)} · ${itemCount} item${itemCount === 1 ? "" : "s"}. Thank you for your purchase.`;
-      await provider.sendText(phone, summary);
       const documentResult = await provider.sendDocument(
         phone,
         mediaUrl,
-        `Invoice ${invoiceNo}`,
+        caption,
       );
       if (!documentResult.providerMessageId) {
         throw new Error(

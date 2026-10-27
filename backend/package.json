@@ -22,6 +22,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node scripts/run-tests.js",
+    "test:whatsapp": "node scripts/testWhatsapp.js",
     "dev": "nodemon server.js",
     "start": "node server.js",
     "lint": "eslint src server.js scripts tests eslint.config.js",

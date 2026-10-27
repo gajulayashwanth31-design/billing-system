@@ -14,8 +14,10 @@ describe("Twilio WhatsApp provider", () => {
     process.env.TWILIO_AUTH_TOKEN = "test-auth-token";
     process.env.TWILIO_WHATSAPP_FROM = "whatsapp:+14155238886";
     process.env.PUBLIC_BASE_URL = "https://billing.example";
-    twilio.mockReturnValue({ messages: { create: messagesCreate } });
-    messagesCreate.mockResolvedValue({ sid: "SM123" });
+    const messages = jest.fn();
+    messages.create = messagesCreate;
+    twilio.mockReturnValue({ messages });
+    messagesCreate.mockResolvedValue({ sid: "SM123", status: "queued" });
   });
 
   afterEach(() => {
@@ -39,7 +41,7 @@ describe("Twilio WhatsApp provider", () => {
       body: "Invoice ready",
       statusCallback: "https://billing.example/api/webhooks/twilio/status",
     });
-    expect(result).toEqual({ providerMessageId: "SM123", status: "SENT" });
+    expect(result).toEqual({ providerMessageId: "SM123", status: "queued" });
   });
 
   test("sends PDF media and attaches the delivery callback", async () => {
@@ -58,5 +60,26 @@ describe("Twilio WhatsApp provider", () => {
       statusCallback: "https://billing.example/api/webhooks/twilio/status",
     });
     expect(result.providerMessageId).toBe("SM123");
+  });
+
+  test("fetches final message status and delivery error details", async () => {
+    const messages = jest.fn().mockReturnValue({
+      fetch: jest.fn().mockResolvedValue({
+        status: "delivered",
+        errorCode: null,
+        errorMessage: null,
+      }),
+    });
+    messages.create = messagesCreate;
+    twilio.mockReturnValue({ messages });
+
+    const result = await createTwilioProvider().getMessageStatus("SM123");
+
+    expect(messages).toHaveBeenCalledWith("SM123");
+    expect(result).toEqual({
+      status: "delivered",
+      errorCode: null,
+      errorMessage: null,
+    });
   });
 });

@@ -20,7 +20,10 @@ function createTwilioProvider() {
         body: text,
         ...(statusCallback ? { statusCallback } : {}),
       });
-      return { providerMessageId: message.sid, status: "SENT" };
+      return {
+        providerMessageId: message.sid,
+        status: message.status,
+      };
     },
     async sendDocument(to, mediaUrl, caption) {
       const message = await client.messages.create({
@@ -30,7 +33,18 @@ function createTwilioProvider() {
         mediaUrl: [mediaUrl],
         ...(statusCallback ? { statusCallback } : {}),
       });
-      return { providerMessageId: message.sid, status: "SENT" };
+      return {
+        providerMessageId: message.sid,
+        status: message.status,
+      };
+    },
+    async getMessageStatus(messageSid) {
+      const message = await client.messages(messageSid).fetch();
+      return {
+        status: message.status,
+        errorCode: message.errorCode,
+        errorMessage: message.errorMessage,
+      };
     },
   };
 }

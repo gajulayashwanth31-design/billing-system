@@ -104,6 +104,8 @@ These seeded accounts and passwords are for local demonstration only:
 | CUSTOMER | `priya` | `Customer@123` |
 | CUSTOMER | `rahul` | `Customer@123` |
 
+For a step-by-step cashier, customer, and admin presentation, see the [role-by-role demo walkthrough](./docs/role-demo-walkthrough.md).
+
 ## Environment variables
 
 | Variable | Purpose |
@@ -129,7 +131,7 @@ The test runner also reads `TEST_DB_HOST`, `TEST_DB_PORT`, `TEST_DB_ADMIN_USER`,
 
 ## Optional real WhatsApp setup with Twilio
 
-The app runs locally in mock mode without any Twilio account or credentials. For real sandbox delivery:
+The app runs locally in mock mode without any Twilio account or credentials. After an invoice is fully paid, its PDF is sent to the customer's saved phone number when WhatsApp opt-in is enabled. For a demo, update seeded customer Priya (`customer_id = 1`) to your own number as shown below. For real sandbox delivery:
 
 1. Create a free Twilio account and verify your phone number.
 2. In the Twilio Console, open **Messaging → Try it out → Send a WhatsApp message** (WhatsApp Sandbox). Note the sandbox WhatsApp number and the exact `join <code>` message shown there.
@@ -163,6 +165,14 @@ The app runs locally in mock mode without any Twilio account or credentials. For
    ```
 
    Replace `+91XXXXXXXXXX` with your verified WhatsApp number. This update preserves the seeded customer's WhatsApp opt-in.
+
+8. To test WhatsApp text delivery without ngrok or a paid invoice, run this from the `backend` folder:
+
+   ```powershell
+   npm run test:whatsapp -- +91XXXXXXXXXX
+   ```
+
+   The command sends one text to that number. The phone must have joined the Twilio sandbox. This text-only test does not require ngrok; a public URL is needed later for Twilio to fetch invoice PDFs.
 
 Keep `WHATSAPP_PROVIDER=mock` as a fallback if the sandbox or ngrok URL is unavailable. See [docs/demo-script.md](./docs/demo-script.md) for the pre-demo checklist.
 

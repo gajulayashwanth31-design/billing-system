@@ -44,5 +44,5 @@ Use the admin WhatsApp log to show the final status and retry count. For a prese
 
 1. Restart ngrok and update `PUBLIC_BASE_URL` in `backend/.env` to its current HTTPS URL.
 2. Re-join the Twilio WhatsApp Sandbox from every demo phone by sending the current `join <code>` message; sandbox membership expires after 72 hours.
-3. Run `npm run test:whatsapp -- +91XXXXXXXXXX` from `backend` and confirm that the test text and sample PDF are delivered.
+3. Run `npm run test:whatsapp -- +91XXXXXXXXXX` from `backend` and confirm that the test text is delivered. This text-only check does not need ngrok.
 4. Keep `WHATSAPP_PROVIDER=mock` ready as the fallback; switch back to it and restart the backend if the sandbox or public URL is unavailable.
